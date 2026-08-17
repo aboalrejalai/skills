@@ -24,6 +24,6 @@
   },
   "overrides": {
     "picomatch": "4.0.4",
-    "rollup": "^4.59.0"
+    "rollup": "^4.62.4"
   }
 }

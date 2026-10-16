@@ -1,0 +1,8 @@
+---
+// OWNER: SEO agent. Stub: renders <title> and description only.
+import type { Lang } from '../lib/types';
+interface Props { lang: Lang; title: string; description: string; path: string; ogImage?: string; noindex?: boolean; }
+const { title, description } = Astro.props;
+---
+<title>{title}</title>
+<meta name="description" content={description} />

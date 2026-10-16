@@ -1,0 +1,13 @@
+---
+// OWNER: skill-page agent. Stub.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSkillDetail } from '../../lib/catalog';
+import { localePath } from '../../i18n';
+import type { Lang } from '../../lib/types';
+interface Props { lang: Lang; id: string; }
+const { lang, id } = Astro.props;
+const skill = getSkillDetail(id);
+---
+<BaseLayout lang={lang} title={skill.name} description={skill.description} path={localePath(lang, `/skills/${id}/`)}>
+  <h1>{skill.name}</h1><pre>{skill.install}</pre>
+</BaseLayout>

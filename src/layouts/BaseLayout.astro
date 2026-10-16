@@ -1,0 +1,18 @@
+---
+// OWNER: layout agent. Stub with the final props contract.
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import { dir } from '../i18n';
+import type { Lang } from '../lib/types';
+interface Props { lang: Lang; title: string; description: string; path: string; ogImage?: string; noindex?: boolean; }
+const props = Astro.props;
+---
+<!doctype html>
+<html lang={props.lang} dir={dir(props.lang)}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Seo {...props} />
+  </head>
+  <body><slot /></body>
+</html>

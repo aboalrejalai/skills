@@ -1,47 +1,43 @@
 {
   "name": "aboalrejal-skills",
-  "version": "1.0.0",
-  "description": "The ultimate high-performance repository of agentic skills for AI coding assistants.",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Mohammed Abo Alrejal's curated catalog of agent skills: the ones he made, uses, and recommends.",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "validate": "node tools/scripts/run-python.js tools/scripts/plugin_compatibility.py",
-    "index": "node tools/scripts/run-python.js tools/scripts/generate_index.py",
-    "readme": "node tools/scripts/run-python.js tools/scripts/update_readme.py",
-    "app:setup": "node tools/scripts/setup_web.js",
-    "app:dev": "npm run app:setup && cd apps/web-app && npm run dev",
-    "app:build": "npm run app:setup && cd apps/web-app && npm run build",
-    "deploy": "node tools/scripts/deploy.js",
-    "chain": "npm run validate && npm run index && npm run readme",
-    "sync:all": "npm run chain"
-  },
-  "dependencies": {
-    "@types/node": "^26.0.0",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vercel/oidc": "^3.6.2",
-    "autoprefixer": "^10.5.0",
-    "next": "^16.2.9",
-    "postcss": "^8.5.15",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tailwindcss": "^4.3.1",
-    "typescript": "^6.0.3",
-    "yaml": "^2.8.2"
+    "catalog": "node scripts/build-catalog.mjs",
+    "zips": "node scripts/build-zips.mjs",
+    "dev": "astro dev",
+    "build": "npm run catalog && npm run zips && astro build",
+    "preview": "wrangler dev",
+    "check": "astro check",
+    "deploy": "npm run build && wrangler deploy",
+    "add": "node scripts/add-skill.mjs",
+    "import:lock": "node scripts/import-lock.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aboalrejal-ai/skills.git"
+    "url": "git+https://github.com/aboalrejalai/skills.git"
   },
-  "keywords": [
-    "claude-code",
-    "cursor",
-    "gemini-cli",
-    "antigravity",
-    "agentic-skills",
-    "ai-coding"
-  ]
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@fontsource/inconsolata": "^5.3.0",
+    "@lucide/astro": "^1.57.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.4.0",
+    "fflate": "^0.8.3",
+    "marked": "^18.1.1",
+    "sanitize-html": "^2.18.1",
+    "tailwindcss": "^4.3.3",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^26.6.5",
+    "@types/sanitize-html": "^2.16.2",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.151.0"
+  }
 }

@@ -1,31 +1,14 @@
-# IDE / Workspace Files
-aboalrejal-skills.code-workspace
-.vscode/
-
-# Environment and Secrets
-.env
-.env.local
-.env.*
-*.log
-secrets.json
-
-# Dependencies
 node_modules/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.ipynb_checkpoints/
-.venv/
-venv/
-env/
-
-# OS Files
-Thumbs.db
+dist/
+.astro/
+.wrangler/
+.cache/
+src/data/generated/
+public/dl/
+.env
+.env.*
+.dev.vars
+*.log
 .DS_Store
-
-# Graphify
 graphify-out/
-.next/
-NUL
-
+.vscode/

@@ -1,0 +1,9 @@
+---
+import SkillPage from '../../../components/skill/SkillPage.astro';
+import { getCatalog } from '../../../lib/catalog';
+export function getStaticPaths() {
+  return getCatalog().skills.map((s) => ({ params: { id: s.id } }));
+}
+const { id } = Astro.params;
+---
+<SkillPage lang="en" id={id} />

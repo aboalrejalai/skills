@@ -1,0 +1,13 @@
+---
+// OWNER: home agent. Stub.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCatalog } from '../../lib/catalog';
+import { localePath } from '../../i18n';
+import type { Lang } from '../../lib/types';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const catalog = getCatalog();
+---
+<BaseLayout lang={lang} title="Skills" description="Skills" path={localePath(lang, '/')}>
+  <ul>{catalog.skills.map((s) => <li><a href={localePath(lang, `/skills/${s.id}/`)}>{s.name}</a></li>)}</ul>
+</BaseLayout>

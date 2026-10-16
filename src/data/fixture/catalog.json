@@ -1,0 +1,272 @@
+{
+  "generatedAt": "2026-10-16T00:00:00.000Z",
+  "skills": [
+    {
+      "id": "saudi-soft",
+      "name": "saudi-soft",
+      "description": "Builds complete React apps with upstream shadcn/ui under the Saudi Soft identity — SA green (#1B8354), IBM Plex Sans Arabic, lucide icons, 10/12px radius, RTL, light/dark tokens, Soft app shell and KPI/hub card recipes. Covers init, add, search, compose, theme, forms, charts, dashboards, and chat UI. Use when the user mentions Saudi Soft, Soft theme, Saudi green branding on shadcn, studio/portfolio/SaaS with Soft colors, RTL Arabic UI, Soft sidebar/dashboard, or asks to scaffold a Soft project. Self-contained: does not require any other skill folder.\n",
+      "category": "frontend-design",
+      "tags": [
+        "made",
+        "use",
+        "favorite"
+      ],
+      "own": true,
+      "local": false,
+      "note": {
+        "ar": "هويتي البصرية لكل واجهة أبنيها: shadcn بالأخضر السعودي وخط IBM Plex Sans Arabic.",
+        "en": "My visual identity for every UI I build: shadcn in Saudi green with IBM Plex Sans Arabic."
+      },
+      "source": {
+        "owner": "aboalrejalai",
+        "repo": "saudi-soft",
+        "ref": "main",
+        "path": "skills/saudi-soft"
+      },
+      "githubUrl": "https://github.com/aboalrejalai/saudi-soft/tree/main/skills/saudi-soft",
+      "skillsShUrl": "https://skills.sh/aboalrejalai/saudi-soft/saudi-soft",
+      "zipUrl": "/dl/saudi-soft.zip",
+      "install": "npx skills add aboalrejalai/saudi-soft --skill saudi-soft",
+      "files": [
+        {
+          "path": "cli.md",
+          "size": 17304,
+          "binary": false
+        },
+        {
+          "path": "customization.md",
+          "size": 5952,
+          "binary": false
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 5013,
+          "binary": false
+        },
+        {
+          "path": "mcp.md",
+          "size": 3510,
+          "binary": false
+        },
+        {
+          "path": "references/identity.md",
+          "size": 4380,
+          "binary": false
+        },
+        {
+          "path": "references/rebrand.md",
+          "size": 2543,
+          "binary": false
+        },
+        {
+          "path": "references/recipes.md",
+          "size": 5541,
+          "binary": false
+        },
+        {
+          "path": "references/theme-bridge.css",
+          "size": 9654,
+          "binary": false
+        },
+        {
+          "path": "registry.md",
+          "size": 8817,
+          "binary": false
+        },
+        {
+          "path": "rules/base-vs-radix.md",
+          "size": 6954,
+          "binary": false
+        },
+        {
+          "path": "rules/chat.md",
+          "size": 8018,
+          "binary": false
+        },
+        {
+          "path": "rules/composition.md",
+          "size": 5363,
+          "binary": false
+        },
+        {
+          "path": "rules/forms.md",
+          "size": 4857,
+          "binary": false
+        },
+        {
+          "path": "rules/icons.md",
+          "size": 1955,
+          "binary": false
+        },
+        {
+          "path": "rules/styling.md",
+          "size": 5621,
+          "binary": false
+        },
+        {
+          "path": "scripts/apply-theme.js",
+          "size": 2640,
+          "binary": false
+        },
+        {
+          "path": "scripts/evaluate-project.js",
+          "size": 8901,
+          "binary": false
+        },
+        {
+          "path": "SKILL.md",
+          "size": 12443,
+          "binary": false
+        }
+      ],
+      "totalBytes": 119466
+    },
+    {
+      "id": "clean-code-guard",
+      "name": "clean-code-guard",
+      "description": "Review generated or changed production code before it ships, using Clean Code, SOLID, DRY, KISS, YAGNI, and LLM-specific failure-mode checks in any programming language. Best used reactively after an agent writes, edits, refactors, or fixes code, before presenting, committing, or merging the result. Use when the user asks \"review this PR\", \"is this safe to merge?\", \"make this cleaner\", \"audit this code\", \"refactor this\", \"fix this bug\", or after a coding agent produced implementation code. Can also guide writing when explicitly invoked before a risky edit. Invoke it on your own initiative the moment you finish writing, editing, or refactoring non-trivial production code, before presenting or committing — don't wait to be asked. DO NOT USE for factual/conceptual questions, CI/tooling config, git workflow, running/debugging tests, pure architecture discussion, prose writing, data analysis, or test-code review (use test-guard).",
+      "category": "code-quality",
+      "tags": [
+        "use",
+        "recommend"
+      ],
+      "own": false,
+      "local": false,
+      "source": {
+        "owner": "amElnagdy",
+        "repo": "guard-skills",
+        "ref": "main",
+        "path": "skills/clean-code-guard"
+      },
+      "githubUrl": "https://github.com/amElnagdy/guard-skills/tree/main/skills/clean-code-guard",
+      "skillsShUrl": "https://skills.sh/amElnagdy/guard-skills/clean-code-guard",
+      "zipUrl": "/dl/clean-code-guard.zip",
+      "install": "npx skills add amElnagdy/guard-skills --skill clean-code-guard",
+      "files": [
+        {
+          "path": "agents/openai.yaml",
+          "size": 232,
+          "binary": false
+        },
+        {
+          "path": "references/ai-failure-modes.md",
+          "size": 16079,
+          "binary": false
+        },
+        {
+          "path": "references/comments-and-formatting.md",
+          "size": 5203,
+          "binary": false
+        },
+        {
+          "path": "references/dry-kiss-yagni.md",
+          "size": 8819,
+          "binary": false
+        },
+        {
+          "path": "references/naming-and-functions.md",
+          "size": 6494,
+          "binary": false
+        },
+        {
+          "path": "references/review-checklist.md",
+          "size": 9159,
+          "binary": false
+        },
+        {
+          "path": "references/solid.md",
+          "size": 10279,
+          "binary": false
+        },
+        {
+          "path": "references/sources.md",
+          "size": 3250,
+          "binary": false
+        },
+        {
+          "path": "SKILL.md",
+          "size": 17438,
+          "binary": false
+        }
+      ],
+      "totalBytes": 76953
+    },
+    {
+      "id": "kickoff-plan",
+      "name": "kickoff-plan",
+      "description": "The user's planning method and the first station of the kickoff line. Use at the start of any coding task, whenever the user asks to plan a project, break down work, map out a new feature, or architect a solution, even without the word 'plan', and when he says kickoff / ابدأ. It decomposes work into atomic, risk-rated tasks that each carry a check the agent can run, and saves the plan to .cursor/plans/NNN-name.plan.md, linked into .agents/plans/ and .claude/plans/. That file is the contract kickoff-implement, kickoff-review and kickoff-ship read.",
+      "category": "planning-workflow",
+      "tags": [
+        "made",
+        "use"
+      ],
+      "own": true,
+      "local": true,
+      "source": {
+        "owner": "aboalrejalai",
+        "repo": "skills",
+        "ref": "main",
+        "path": "skills/kickoff-plan"
+      },
+      "githubUrl": "https://github.com/aboalrejalai/skills/tree/main/skills/kickoff-plan",
+      "skillsShUrl": "https://skills.sh/aboalrejalai/skills/kickoff-plan",
+      "zipUrl": "/dl/kickoff-plan.zip",
+      "install": "npx skills add aboalrejalai/skills --skill kickoff-plan",
+      "files": [
+        {
+          "path": "assets/plan-template.md",
+          "size": 3235,
+          "binary": false
+        },
+        {
+          "path": "assets/task-template.md",
+          "size": 1067,
+          "binary": false
+        },
+        {
+          "path": "references/platform-native.md",
+          "size": 7799,
+          "binary": false
+        },
+        {
+          "path": "scripts/new-plan.sh",
+          "size": 1445,
+          "binary": false
+        },
+        {
+          "path": "SKILL.md",
+          "size": 13603,
+          "binary": false
+        }
+      ],
+      "totalBytes": 27149
+    }
+  ],
+  "collections": [
+    {
+      "id": "marketing-skills",
+      "title": {
+        "ar": "حزمة سكيلز التسويق",
+        "en": "Marketing skills pack"
+      },
+      "description": {
+        "ar": "975 سكيل للتسويق والمحتوى والـ SEO والأمن السيبراني، مقسمة على 36 مجموعة.",
+        "en": "975 skills for marketing, content, SEO and cybersecurity, in 36 groups."
+      },
+      "category": "seo-marketing",
+      "tags": [
+        "made"
+      ],
+      "own": true,
+      "source": {
+        "owner": "aboalrejal-ai",
+        "repo": "marketing-skills",
+        "ref": "main"
+      },
+      "skillCount": 975,
+      "githubUrl": "https://github.com/aboalrejal-ai/marketing-skills",
+      "skillsShUrl": "https://skills.sh/aboalrejal-ai/marketing-skills",
+      "install": "npx skills add aboalrejal-ai/marketing-skills --list"
+    }
+  ]
+}

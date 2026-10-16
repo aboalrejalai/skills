@@ -1,0 +1,122 @@
+---
+// Install command builder + download / links. OWNER: skill-page agent (A8).
+// Progressive enhancement: the plain base command is server-rendered and selectable; the agent
+// select, global checkbox and copy buttons are revealed by src/scripts/skill-page.ts.
+import fs from 'node:fs';
+import path from 'node:path';
+import { Check, Copy, Download, ExternalLink, FileText, FolderGit2, PackageOpen, Terminal } from '@lucide/astro';
+import { INSTALL_AGENTS, skillStrings } from '../../i18n/strings/skill';
+import type { Lang, SkillDetail } from '../../lib/types';
+import { formatBytes } from './format';
+import { btnOutline, btnPrimary, card, iconBtn, sectionTitle } from './ui';
+
+interface Props {
+  lang: Lang;
+  skill: SkillDetail;
+}
+const { lang, skill } = Astro.props;
+const t = skillStrings[lang];
+
+// The ZIP is built into public/dl/ before `astro build`; fall back to the uncompressed size.
+let zipBytes: number | undefined;
+try {
+  zipBytes = fs.statSync(path.join(process.cwd(), 'public', skill.zipUrl)).size;
+} catch {
+  zipBytes = undefined;
+}
+const zipSize = zipBytes ? formatBytes(zipBytes, lang) : `${formatBytes(skill.totalBytes, lang)} ${t.zipSizeApprox}`;
+
+const { owner, repo, ref, path: dir } = skill.source;
+const rawSkillMd = `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${dir ? `${dir}/` : ''}SKILL.md`;
+const skillMdText = skill.texts['SKILL.md'] ?? skill.body;
+const skillMdJson = JSON.stringify(skillMdText).replace(/</g, '\\u003c');
+const control = 'min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground';
+---
+<section class={`${card} p-4 sm:p-5`} aria-labelledby="sk-install-title" data-install data-base={skill.install}>
+  <h2 id="sk-install-title" class={sectionTitle}>
+    <Terminal class="size-5 text-primary" aria-hidden="true" />{t.install}
+  </h2>
+  <p class="mt-1 text-sm text-muted-foreground">{t.installHelp}</p>
+
+  <div class="mt-4 flex flex-col gap-3" data-install-controls hidden>
+    <div class="flex flex-col gap-1.5">
+      <label for="sk-install-agent" class="text-sm font-medium text-label">{t.agent}</label>
+      <select id="sk-install-agent" class={control} data-install-agent>
+        <option value="">{t.agentDefault}</option>
+        {INSTALL_AGENTS.map((a) => <option value={a.id}>{a.label}</option>)}
+      </select>
+    </div>
+    <label class="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+      <input type="checkbox" class="size-5 shrink-0 accent-primary" data-install-global />
+      <span>{t.global} <code dir="ltr" class="rounded bg-muted px-1 font-mono text-xs">-g</code></span>
+    </label>
+  </div>
+
+  <p id="sk-install-label" class="sr-only">{t.command}</p>
+  <div class="mt-4 flex items-stretch overflow-hidden rounded-md border border-border bg-muted" dir="ltr">
+    <pre class="min-w-0 flex-1 px-3 py-3 text-start text-sm leading-6 whitespace-pre-wrap [overflow-wrap:anywhere]" aria-labelledby="sk-install-label"><code id="sk-install-cmd" data-install-output>{skill.install}</code></pre>
+    <button
+      type="button"
+      class={`${iconBtn} self-start me-0.5 mt-0.5`}
+      data-copy
+      data-copy-target="sk-install-cmd"
+      data-label={t.copyCommand}
+      data-copied-label={t.copied}
+      aria-label={t.copyCommand}
+      title={t.copyCommand}
+      hidden
+    >
+      <Copy class="size-4" data-icon="idle" aria-hidden="true" />
+      <Check class="hidden size-4" data-icon="done" aria-hidden="true" />
+    </button>
+  </div>
+  <p class="mt-2 text-xs leading-5 text-muted-foreground">
+    {t.agentHintPre} <code dir="ltr" class="rounded bg-muted px-1 font-mono">-a</code> {t.agentHintPost}
+  </p>
+
+  <div class="mt-5 flex flex-col gap-2 border-t border-border pt-5">
+    <a href={skill.zipUrl} download={`${skill.name}.zip`} class={`${btnPrimary} w-full`}>
+      <Download class="size-4" aria-hidden="true" />
+      <span>{t.downloadZip}</span>
+      <span class="text-xs font-normal opacity-80" dir="auto">({zipSize})</span>
+    </a>
+    <a href={skill.githubUrl} target="_blank" rel="noopener noreferrer" class={`${btnOutline} w-full`}>
+      <FolderGit2 class="size-4" aria-hidden="true" />{t.viewGithub}<span class="sr-only"> {t.opensExternal}</span>
+    </a>
+    <a href={skill.skillsShUrl} target="_blank" rel="noopener noreferrer" class={`${btnOutline} w-full`}>
+      <ExternalLink class="size-4 rtl:-scale-x-100" aria-hidden="true" />{t.viewSkillsSh}<span class="sr-only"> {t.opensExternal}</span>
+    </a>
+    <button
+      type="button"
+      class={`${btnOutline} w-full data-[state=copied]:border-primary/40 data-[state=copied]:text-primary`}
+      data-copy
+      data-copy-source="sk-skill-md"
+      data-label={t.copySkillMd}
+      data-copied-label={t.copied}
+      hidden
+    >
+      <FileText class="size-4" data-icon="idle" aria-hidden="true" />
+      <Check class="hidden size-4" data-icon="done" aria-hidden="true" />
+      <span data-copy-text>{t.copySkillMd}</span>
+    </button>
+    <noscript>
+      <a href={rawSkillMd} target="_blank" rel="noopener noreferrer" class={`${btnOutline} w-full`}>
+        <FileText class="size-4" aria-hidden="true" />{t.rawSkillMd}
+      </a>
+    </noscript>
+  </div>
+
+  <div class="mt-5 flex gap-3 rounded-lg bg-muted/60 p-3 text-xs leading-6 text-muted-foreground">
+    <PackageOpen class="mt-1 size-4 shrink-0" aria-hidden="true" />
+    <div class="min-w-0">
+      <p><span class="font-semibold text-foreground">{t.manualTitle}:</span> {t.manualBody}</p>
+      <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <code dir="ltr" class="rounded bg-card px-1.5 font-mono text-foreground">~/.claude/skills/</code>
+        <span>{t.manualOr}</span>
+        <code dir="ltr" class="rounded bg-card px-1.5 font-mono text-foreground">.agents/skills/</code>
+      </p>
+    </div>
+  </div>
+
+  <script is:inline type="application/json" id="sk-skill-md" set:html={skillMdJson} />
+</section>

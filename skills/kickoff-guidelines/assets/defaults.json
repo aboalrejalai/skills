@@ -1,0 +1,108 @@
+{
+  "lang": "ar",
+  "motif": "najdi",
+  "colors": {
+    "ink": "#0D121C",
+    "ink2": "#384250",
+    "muted": "#4D5761",
+    "line": "#E5E7EB",
+    "highlight": "#FFDE59",
+    "danger": "#D92D20",
+    "canvas": "#d9dfdb"
+  },
+  "cover": {
+    "kicker": "الدليل الإرشادي للهوية البصرية",
+    "tag": "BRAND GUIDELINES · {year}"
+  },
+  "intro": { "title": "هويتنا أكثر من شعار" },
+  "traits": { "title": "سمات العلامة التجارية" },
+  "logoSlide": {
+    "title": "شعار الهوية",
+    "stacked": "الشعار الكامل",
+    "horizontal": "الشعار الأفقي",
+    "mark": "العلامة (الأيقونة)"
+  },
+  "construction": { "title": "هيكلة الشعار", "label": "X" },
+  "palette": {
+    "title": "لوحة الألوان",
+    "inkLabel": "الحبر — للنصوص",
+    "whiteLabel": "الأبيض — للمساحات",
+    "scaleLabel": "التدرج اللوني (من نفس اللون)",
+    "scalePrefix": "",
+    "usageLabel": "نسب الاستخدام",
+    "usage": [
+      { "label": "أبيض", "pct": 60, "color": "white" },
+      { "label": "الأساسي", "pct": 30, "color": "600" },
+      { "label": "", "pct": 10, "color": "ink" }
+    ]
+  },
+  "typeface": {
+    "arabicLabel": "الخط العربي",
+    "lettersLabel": "• حروفيات الخط:",
+    "letters": "أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن هـ و ي",
+    "familyTitle": "عائلة الخط",
+    "weights": [[400, "Regular"], [500, "Medium"], [600, "SemiBold"], [700, "Bold"], [800, "ExtraBold"], [900, "Black"]],
+    "familyLead": "{weightsWord} لخط {fontAr}، من <span class=\"num\">{firstWeight}</span> إلى الأثقل <span class=\"num\">{lastWeight}</span>.",
+    "familyRoles": "• <strong class=\"num\">Bold</strong> للعناوين الرئيسية.<br>• <strong class=\"num\">SemiBold</strong> للعناوين الفرعية.<br>• <strong class=\"num\">Regular</strong> لنصوص المواضيع.",
+    "latinLabel": "الخط الإنجليزي",
+    "latinGlyph": "Aa",
+    "alphabet": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z<br>0 1 2 3 4 5 6 7 8 9"
+  },
+  "typeScale": {
+    "title": "تدرّج مقاسات النصوص",
+    "steps": [[68, 700, "عنوان رئيسي"], [42, 700, "العنوان الفرعي"], [26, 500, "عنوان القسم"]],
+    "ratioTitle": "النسبة الذهبية",
+    "ratioText": "لموازنة النصوص في جميع التصاميم — منصات التواصل والموقع والمطبوعات — يكبر كل مقاس عن الذي قبله بالنسبة الذهبية.",
+    "ratioFormula": "Golden Ratio: 1.618<br>16 × 1.618 ≈ 26 → 42 → 68"
+  },
+  "misuse": {
+    "markTitle": "الاستخدامات الخاطئة للأيقونة",
+    "markItems": ["قص العلامة", "إمالة العلامة", "تلوين العلامة", "إضافة تأثيرات"],
+    "logoTitle": "الاستخدامات الخاطئة للشعار",
+    "logoItems": ["تغيير أبعاد الشعار", "إمالة الشعار", "تلوين الشعار", "إضافة تأثيرات"]
+  },
+  "clearSpace": {
+    "title": "المساحة الآمنة للشعار",
+    "minPrint": "35mm",
+    "minScreen": "140px",
+    "paragraphs": [
+      "الحفاظ على <b>المساحة الآمنة</b> حول الشعار يضمن وضوحه وتوازنه وسهولة قراءته في كل الوسائط.",
+      "اترك حول الشعار من كل الجهات مساحة لا تقل عن <b class=\"num\">2X</b>، حيث <b class=\"num\">X</b> سماكة خط العلامة، ولا يدخلها نص أو صورة أو حافة.",
+      "أصغر عرض للشعار الأفقي: <strong class=\"num\">{minPrint}</strong> مطبوعًا، و<strong class=\"num\">{minScreen}</strong> على الشاشة."
+    ]
+  },
+  "placement": {
+    "title": "أماكن استخدام الشعار",
+    "paragraphs": [
+      "• <b>العلامة</b> يمكن وضعها في أي زاوية من زوايا التصميم.",
+      "• يُفضّل وضع <b>الشعار الأفقي</b> في الزاوية العليا اليمنى، لأن القراءة العربية تبدأ منها.",
+      "• الشعار متعدد الاستخدامات: يوضع في المنتصف للأغلفة، وفي الزاوية اليسرى السفلى للخواتيم والتواقيع."
+    ]
+  },
+  "patterns": { "title": "أنماط الشعار", "gap": 0.12 },
+  "najdi": {
+    "title": "الأنماط النجدية",
+    "items": [
+      { "label": "الشُّرَف — تحت الترويسة", "file": "najdi-teeth-down.svg", "bg": "white", "fit": "contain" },
+      { "label": "الشُّرَف — فوق التذييل", "file": "najdi-teeth-up.svg", "bg": "white", "fit": "contain" },
+      { "label": "نقش المثلثات على الأخضر", "file": "triangle-texture-on-green.svg", "bg": "700", "fit": "cover" },
+      { "label": "نقش المثلثات على الأبيض", "file": "triangle-texture-on-white.svg", "bg": "white", "fit": "cover" }
+    ]
+  },
+  "elements": { "title": "العناصر الجرافيكية" },
+  "iconStyle": {
+    "title": "أسلوب الأيقونات",
+    "names": ["phone", "mail", "map-pin", "globe", "user", "building-2", "file-text", "calendar", "shield-check", "code", "smartphone", "server", "handshake", "chart-column", "message-circle"],
+    "caption": "(Lucide · Line icons · 2px stroke · rounded caps)"
+  },
+  "letterhead": { "title": "التطبيقات" },
+  "card": { "title": "التطبيقات", "caption": "بطاقة العمل — الوجه والظهر" },
+  "appIcon": {
+    "kicker": "التطبيقات",
+    "title": "أيقونة التطبيق والمتصفح",
+    "sizes": [180, 64, 32, 16]
+  },
+  "mockups": { "kicker": "التطبيقات", "title": "منشورات التواصل الاجتماعي", "storeTitle": "واجهة المتجر" },
+  "banners": { "title": "تصميمات البنرات" },
+  "closing": { "thanks": "شكرًا لوصولك إلى النهاية" }
+}

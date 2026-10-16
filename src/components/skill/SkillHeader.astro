@@ -1,0 +1,109 @@
+---
+// Skill page header: breadcrumb, name, description, credit, badges, note, facts. OWNER: skill-page agent (A8).
+import { CalendarDays, ChevronRight, Files, FolderGit2, HardDrive, Heart, Layers, Package, Sparkles } from '@lucide/astro';
+import { CATEGORY_LABELS, TAG_LABELS, localePath } from '../../i18n';
+import { skillStrings } from '../../i18n/strings/skill';
+import type { Lang, SkillDetail } from '../../lib/types';
+import { formatBytes, formatDate } from './format';
+import { chip } from './ui';
+
+interface Props {
+  lang: Lang;
+  skill: SkillDetail;
+}
+const { lang, skill } = Astro.props;
+const t = skillStrings[lang];
+const { owner, repo } = skill.source;
+const ownerUrl = `https://github.com/${owner}`;
+const repoUrl = `https://github.com/${owner}/${repo}`;
+// The credit line already says "made by me", so the "made" tag would repeat it.
+const tags = skill.tags.filter((tag) => !(skill.own && tag === 'made'));
+const note = skill.note?.[lang];
+const tagTone: Record<string, string> = {
+  favorite: 'border-warning/30 bg-warning/10 text-warning',
+  made: 'border-primary/20 bg-primary/10 text-primary',
+  use: 'border-primary/20 bg-primary/10 text-primary',
+  recommend: 'border-info/30 bg-info/10 text-info',
+};
+const fact = 'inline-flex items-center gap-1.5';
+---
+<header class="flex flex-col gap-5">
+  <nav aria-label={t.breadcrumb}>
+    <ol class="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
+      <li>
+        <a href={localePath(lang, '/')} class="inline-flex min-h-11 items-center rounded-md px-1 font-medium hover:text-primary">
+          {t.catalog}
+        </a>
+      </li>
+      <li aria-hidden="true"><ChevronRight class="size-4 rtl:rotate-180" /></li>
+      <li><span aria-current="page" dir="auto" class="font-medium text-foreground">{skill.name}</span></li>
+    </ol>
+  </nav>
+
+  <div class="flex items-start gap-3 sm:gap-4">
+    <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
+      {skill.own ? <Sparkles class="size-6" /> : <Package class="size-6" />}
+    </div>
+    <div class="min-w-0 flex-1">
+      <h1 class="text-2xl font-bold tracking-tight break-words md:text-3xl"><span dir="auto">{skill.name}</span></h1>
+      <p class="mt-1 text-sm text-muted-foreground">
+        {skill.own ? (
+          <span class="font-medium text-primary">{t.madeByMe}</span>
+        ) : (
+          <span>
+            {t.madeBy}{' '}
+            <a href={ownerUrl} target="_blank" rel="noopener noreferrer" class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:text-primary hover:decoration-primary">
+              <bdi>{owner}</bdi><span class="sr-only"> {t.opensExternal}</span>
+            </a>
+          </span>
+        )}
+      </p>
+    </div>
+  </div>
+
+  <p dir="auto" class="max-w-3xl text-sm leading-7 text-foreground/90 md:text-base md:leading-8">{skill.description}</p>
+
+  <ul class="flex flex-wrap items-center gap-2" aria-label={t.tags}>
+    <li class={`${chip} border-border bg-muted/50 text-muted-foreground`}>
+      <Layers class="size-3.5" aria-hidden="true" /><span class="sr-only">{t.category}: </span>{CATEGORY_LABELS[skill.category][lang]}
+    </li>
+    {tags.map((tag) => (
+      <li class={`${chip} ${tagTone[tag]}`}>{TAG_LABELS[tag][lang]}</li>
+    ))}
+  </ul>
+
+  {note && (
+    <aside class="flex max-w-3xl gap-3 rounded-xl border border-primary/15 bg-primary-subtle p-4" aria-label={t.noteLabel}>
+      <Heart class="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />
+      <div>
+        <p class="text-xs font-semibold text-primary">{t.noteLabel}</p>
+        <p class="mt-1 text-sm leading-7 text-label">{note}</p>
+      </div>
+    </aside>
+  )}
+
+  <dl class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+    <div class={fact}>
+      <dt><FolderGit2 class="size-4" aria-hidden="true" /><span class="sr-only">{t.source}</span></dt>
+      <dd>
+        <a href={repoUrl} target="_blank" rel="noopener noreferrer" dir="ltr" class="font-medium text-foreground hover:text-primary">
+          {owner}/{repo}<span class="sr-only"> {t.opensExternal}</span>
+        </a>
+      </dd>
+    </div>
+    {skill.updatedAt && (
+      <div class={fact}>
+        <dt><CalendarDays class="size-4" aria-hidden="true" /><span class="sr-only">{t.updated}</span></dt>
+        <dd><time datetime={skill.updatedAt}>{t.updated}: {formatDate(skill.updatedAt, lang)}</time></dd>
+      </div>
+    )}
+    <div class={fact}>
+      <dt><Files class="size-4" aria-hidden="true" /><span class="sr-only">{t.files}</span></dt>
+      <dd>{t.fileCount(skill.files.length)}</dd>
+    </div>
+    <div class={fact}>
+      <dt><HardDrive class="size-4" aria-hidden="true" /><span class="sr-only">{t.size}</span></dt>
+      <dd dir="auto">{formatBytes(skill.totalBytes, lang)}</dd>
+    </div>
+  </dl>
+</header>

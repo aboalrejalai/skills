@@ -1,17 +1,15 @@
 # Security Policy
 
-## Supported Versions
+## Reporting a vulnerability
 
-We actively support and resolve security vulnerabilities in the following versions:
+Report vulnerabilities privately through GitHub: open a [private security advisory](https://github.com/aboalrejalai/skills/security/advisories/new) on `aboalrejalai/skills`. Please do not open a public issue for security problems.
 
-| Version | Supported |
-| ------- | --------- |
-| v1.x.x  | Yes       |
+This covers the site, the build scripts, and the skills in `skills/`.
 
-## Reporting a Vulnerability
+## Third-party skills
 
-We take the security of our AI skills and automation workflows very seriously. If you discover any security vulnerability or risk (such as prompt injections, execution escapes, or data leakage risks), please report it directly.
+Most skills in the catalog live in other people's repos. This repo does not copy them: it lists them in `catalog.yaml`, fetches them at build time, and renders their `SKILL.md` on the site after sanitizing the HTML. The ZIP downloads contain the upstream files as they were at build time.
 
-Please do **NOT** open a public issue for security-related bugs. Instead, email us at **security@aboalrejal-ai.dev** (or open a private security draft on GitHub).
+If an upstream skill is malicious or unsafe (for example, it hides instructions that exfiltrate data or run harmful commands), report it the same way, or open a normal issue if the skill is already public knowledge. Include the skill's page or `owner/repo` and what it does. It will be removed from `catalog.yaml`, and the next build drops its page and ZIP.
 
-We will acknowledge your report within 48 hours and provide a detailed timeline for resolution.
+Problems inside a third-party skill itself should also go to its author's repo, linked from its page.

@@ -1,0 +1,73 @@
+---
+// Soft hub card for one skill. The name link is stretched over the card; the action buttons sit above it.
+// data-* attributes are the contract with src/scripts/home-search.ts.
+import { Download } from '@lucide/astro';
+import { CATEGORY_LABELS, localePath } from '../../i18n';
+import { fill, homeStrings } from '../../i18n/strings/home';
+import type { Lang, SkillEntry } from '../../lib/types';
+import { CATEGORY_ICONS, TAG_ORDER } from './catalog-view';
+import CopyButton from './CopyButton.astro';
+import TagBadge from './TagBadge.astro';
+
+interface Props {
+  skill: SkillEntry;
+  lang: Lang;
+  search: string;
+}
+const { skill, lang, search } = Astro.props;
+const t = homeStrings[lang];
+const Icon = CATEGORY_ICONS[skill.category];
+const tags = TAG_ORDER.filter((tag) => skill.tags.includes(tag));
+const repo = `${skill.source.owner}/${skill.source.repo}`;
+---
+
+<li
+  data-item
+  data-kind="skill"
+  data-tags={skill.tags.join(' ')}
+  data-cat={skill.category}
+  data-src={skill.own ? 'mine' : 'others'}
+  data-search={search}
+  class="h-full"
+>
+  <article class="relative flex h-full flex-col gap-3 rounded-xl border border-border bg-card p-5 transition-colors focus-within:border-primary/40 hover:border-primary/40 hover:bg-primary/5">
+    <div class="flex items-start gap-3">
+      <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon class="size-5" />
+      </div>
+      <div class="min-w-0">
+        <h3 class="font-semibold leading-snug">
+          <a
+            href={localePath(lang, `/skills/${skill.id}/`)}
+            dir="auto"
+            class="break-words rounded-sm after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-ring"
+          >{skill.name}</a>
+        </h3>
+        <p class="mt-0.5 text-xs text-muted-foreground">{CATEGORY_LABELS[skill.category][lang]}</p>
+      </div>
+    </div>
+
+    <p dir="auto" class="line-clamp-2 text-sm text-muted-foreground">{skill.description}</p>
+
+    {tags.length > 0 && (
+      <ul class="flex flex-wrap gap-1.5" aria-label={t.tagsLabel}>
+        {tags.map((tag) => <li><TagBadge tag={tag} lang={lang} /></li>)}
+      </ul>
+    )}
+
+    <div class="mt-auto flex items-center gap-2 border-t border-border/60 pt-3">
+      <span class="sr-only">{t.sourceLabel}:</span>
+      <span class="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground"><span dir="ltr">{repo}</span></span>
+      <CopyButton text={skill.install} label={`${t.copyInstall}: ${skill.name}`} />
+      <a
+        href={skill.zipUrl}
+        download={`${skill.name}.zip`}
+        aria-label={fill(t.downloadZip, { name: skill.name })}
+        title={fill(t.downloadZip, { name: skill.name })}
+        class="relative z-10 inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary pointer-coarse:size-11"
+      >
+        <Download class="size-4" />
+      </a>
+    </div>
+  </article>
+</li>

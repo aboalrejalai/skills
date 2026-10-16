@@ -1,0 +1,40 @@
+# Cloudflare Workers Static Assets custom headers (copied by Astro from public/ to dist/).
+# Docs: https://developers.cloudflare.com/workers/static-assets/headers/
+# Limits: 100 rules, 2,000 characters per line. When two rules set the same header,
+# Cloudflare joins the values with a comma, so Cache-Control is set ONLY in the
+# path-specific rules below, never in /*. Paths without a rule keep the default
+# "public, max-age=0, must-revalidate" + ETag (HTML pages: always fresh after a deploy).
+#
+# Content-Security-Policy trade-offs:
+# - script-src 'unsafe-inline': the layout ships an inline theme script (sets .dark on
+#   <html> before paint) and Astro may inline small hoisted scripts. Their hashes change
+#   with every edit and build, so pinning hashes here would break the site silently.
+#   The risk is low: the site is fully static, has no user input, and rendered SKILL.md
+#   HTML is sanitized at build time (sanitize-html strips <script> and on* handlers).
+#   To drop 'unsafe-inline', enable Astro's `security: { csp: true }` (per-page meta CSP
+#   with hashes; both policies are enforced, so the stricter one wins) and hash any
+#   `is:inline` script there.
+# - style-src 'unsafe-inline': Astro inlines small stylesheets and components may use
+#   style="" attributes.
+# - img-src https: data:: SKILL.md files reference images on raw.githubusercontent.com
+#   and other hosts; data: covers inline SVG icons.
+# - static.cloudflareinsights.com / cloudflareinsights.com: only used if Cloudflare Web
+#   Analytics is turned on for the domain (it injects its beacon). Harmless otherwise.
+# - frame-ancestors only works in a header (ignored in <meta>), hence it lives here.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
+
+# Hashed build output (JS, CSS, and the self-hosted @fontsource fonts) never changes in place.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Skill ZIPs are rebuilt on every deploy under the same name: cache for an hour, force download.
+/dl/*
+  Content-Disposition: attachment
+  Cache-Control: public, max-age=3600

@@ -1,18 +1,63 @@
 ---
-// OWNER: layout agent. Stub with the final props contract.
+// Site shell used by every page. Props contract is shared with all page agents: do not change it.
 import '../styles/global.css';
 import Seo from '../components/Seo.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
 import { dir } from '../i18n';
+import { layoutStrings } from '../i18n/strings/layout';
 import type { Lang } from '../lib/types';
-interface Props { lang: Lang; title: string; description: string; path: string; ogImage?: string; noindex?: boolean; }
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;
+  ogImage?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
 const props = Astro.props;
+const { lang, path } = props;
+const t = layoutStrings[lang];
 ---
 <!doctype html>
-<html lang={props.lang} dir={dir(props.lang)}>
+<html lang={lang} dir={dir(lang)} class="scroll-pt-[var(--topbar-height)]">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <script is:inline>
+      // Apply the saved theme before first paint to avoid a flash. Mirrors ThemeToggle.astro.
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch (e) {}
+        var dark =
+          stored === 'dark' ||
+          (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var root = document.documentElement;
+        root.classList.toggle('dark', dark);
+        root.style.colorScheme = dark ? 'dark' : 'light';
+      })();
+    </script>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <Seo {...props} />
+    <slot name="head" />
   </head>
-  <body><slot /></body>
+  <body class="flex min-h-dvh flex-col bg-background text-foreground">
+    <a
+      href="#main"
+      class="sr-only rounded-md bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-50"
+    >
+      {t.skipToContent}
+    </a>
+    <Header lang={lang} path={path} />
+    <main id="main" tabindex="-1" class="flex-1 outline-none">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
 </html>

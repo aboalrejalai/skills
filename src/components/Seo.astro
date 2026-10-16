@@ -1,8 +1,141 @@
 ---
-// OWNER: SEO agent. Stub: renders <title> and description only.
+// OWNER: SEO agent (A9). Renders everything SEO-related inside <head>.
+//
+// Props (BaseLayout passes its own props straight through):
+//   lang, title, description, path   required. `path` is the site path of this page, e.g. '/en/skills/x/'.
+//   ogImage?   site path or absolute URL; defaults to /og.png (1200x630).
+//   noindex?   adds <meta name="robots" content="noindex"> and drops canonical/hreflang/og:url.
+//   type?      og:type, 'website' (default) or 'article'.
+//   jsonLd?    one JSON-LD object or an array of them, rendered as-is ("@context" is added when missing).
+//
+// `title` is the page name only ("saudi-soft"); the site name is appended. A title that already
+// contains the site name (the home page) is used as-is.
+//
+// The home page ('/' and '/en/') also gets a default WebSite object with a SearchAction (/?q=...).
+//
+// Expected jsonLd for skill pages (/skills/<id>/), built from SkillEntry:
+//   {
+//     '@context': 'https://schema.org',
+//     '@type': 'SoftwareSourceCode',
+//     name: skill.name,
+//     description: skill.description,
+//     url: new URL(path, Astro.site).href,           // this page
+//     codeRepository: skill.githubUrl,
+//     programmingLanguage: 'Markdown',
+//     runtimePlatform: ['Claude Code', 'Cursor', 'Codex'],
+//     inLanguage: lang,                               // language of the page, not of the skill text
+//     author: { '@type': 'Person', name: skill.source.owner, url: `https://github.com/${skill.source.owner}` },
+//     dateModified: skill.updatedAt,                  // omit when undefined
+//     keywords: [skill.category, ...skill.tags].join(', '),
+//   }
+import { alternatePath } from '../i18n';
+import { OG_LOCALE, SITE_AUTHOR, seo } from '../i18n/strings/seo';
 import type { Lang } from '../lib/types';
-interface Props { lang: Lang; title: string; description: string; path: string; ogImage?: string; noindex?: boolean; }
-const { title, description } = Astro.props;
+
+type JsonLd = Record<string, unknown>;
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;
+  ogImage?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article';
+  jsonLd?: JsonLd | JsonLd[];
+}
+
+const { lang, title, description, path, ogImage, noindex = false, type = 'website', jsonLd } = Astro.props;
+const t = seo[lang];
+const site = Astro.site ?? new URL(Astro.url.origin);
+const abs = (p: string) => new URL(p, site).href;
+
+const siteNames = [seo.ar.siteName, seo.en.siteName];
+const pageTitle = title.trim();
+const fullTitle = !pageTitle
+  ? t.siteName
+  : siteNames.some((n) => pageTitle.includes(n))
+    ? pageTitle
+    : `${pageTitle} | ${t.siteName}`;
+
+function clip(text: string, max = 160): string {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  if (flat.length <= max) return flat;
+  const cut = flat.slice(0, max - 1);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[\s,.;:،؛-]+$/, '')}…`;
+}
+const metaDescription = clip(description || t.description);
+
+const canonical = abs(path);
+const arPath = lang === 'ar' ? path : alternatePath('en', path);
+const enPath = lang === 'en' ? path : alternatePath('ar', path);
+const otherLang: Lang = lang === 'ar' ? 'en' : 'ar';
+
+const image = abs(ogImage ?? '/og.png');
+const isDefaultImage = !ogImage;
+
+const isHome = path === '/' || path === '/en/';
+const homeUrl = abs(lang === 'ar' ? '/' : '/en/');
+const webSite: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: t.siteName,
+  alternateName: seo[otherLang].siteName,
+  url: homeUrl,
+  description: t.description,
+  inLanguage: lang,
+  author: { '@type': 'Person', name: SITE_AUTHOR },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: { '@type': 'EntryPoint', urlTemplate: `${homeUrl}?q={search_term_string}` },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+const ldBlocks: JsonLd[] = [
+  ...(isHome ? [webSite] : []),
+  ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
+].map((o) => ('@context' in o ? o : { '@context': 'https://schema.org', ...o }));
+// Escape '<' so a description containing "</script>" cannot break out of the tag.
+const ldJson = (o: JsonLd) => JSON.stringify(o).replace(/</g, '\\u003c');
 ---
-<title>{title}</title>
-<meta name="description" content={description} />
+<title>{fullTitle}</title>
+<meta name="description" content={metaDescription} />
+{noindex ? (
+  <meta name="robots" content="noindex" />
+) : (
+  <>
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="ar" href={abs(arPath)} />
+    <link rel="alternate" hreflang="en" href={abs(enPath)} />
+    <link rel="alternate" hreflang="x-default" href={abs(arPath)} />
+  </>
+)}
+<link rel="sitemap" href="/sitemap-index.xml" />
+<meta name="theme-color" content="#fcfcfd" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0f1724" media="(prefers-color-scheme: dark)" />
+
+<meta property="og:site_name" content={t.siteName} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={metaDescription} />
+<meta property="og:type" content={type} />
+{!noindex && <meta property="og:url" content={canonical} />}
+<meta property="og:image" content={image} />
+{isDefaultImage && (
+  <>
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+  </>
+)}
+<meta property="og:image:alt" content={isDefaultImage ? t.ogImageAlt : fullTitle} />
+<meta property="og:locale" content={OG_LOCALE[lang]} />
+<meta property="og:locale:alternate" content={OG_LOCALE[otherLang]} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={metaDescription} />
+<meta name="twitter:image" content={image} />
+<meta name="twitter:image:alt" content={isDefaultImage ? t.ogImageAlt : fullTitle} />
+
+{ldBlocks.map((o) => <script is:inline type="application/ld+json" set:html={ldJson(o)} />)}

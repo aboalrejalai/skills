@@ -1,13 +1,144 @@
 ---
-// OWNER: skill-page agent. Stub.
+// Skill detail page (/skills/<id>/ and /en/skills/<id>/). OWNER: skill-page agent (A8).
+import { Braces, FileText, FolderTree } from '@lucide/astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getSkillDetail } from '../../lib/catalog';
+import { langFromPath, renderMarkdown } from '../../lib/markdown';
 import { localePath } from '../../i18n';
+import { skillStrings } from '../../i18n/strings/skill';
 import type { Lang } from '../../lib/types';
-interface Props { lang: Lang; id: string; }
+import FileTree from './FileTree.astro';
+import InstallPanel from './InstallPanel.astro';
+import SkillHeader from './SkillHeader.astro';
+import TableOfContents from './TableOfContents.astro';
+import { buildFileTree, planFileViews, stringifyValue } from './format';
+import { card } from './ui';
+import './skill-prose.css';
+
+interface Props {
+  lang: Lang;
+  id: string;
+}
 const { lang, id } = Astro.props;
+const t = skillStrings[lang];
 const skill = getSkillDetail(id);
+const { html, headings } = renderMarkdown(skill.body, { source: skill.source, copyLabel: t.copyCode });
+const tree = buildFileTree(skill.files);
+const views = planFileViews(skill.files, skill.texts, (p) => !['markdown', 'text'].includes(langFromPath(p)));
+const frontmatter = Object.entries(skill.frontmatter ?? {});
+
+const tabs = [
+  { key: 'skill', label: t.tabSkill, icon: FileText },
+  { key: 'files', label: `${t.tabFiles} (${skill.files.length})`, icon: FolderTree },
+  { key: 'frontmatter', label: t.tabFrontmatter, icon: Braces },
+] as const;
+const path = localePath(lang, `/skills/${id}/`);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: skill.name,
+  description: skill.description,
+  url: new URL(path, Astro.site ?? Astro.url.origin).href,
+  codeRepository: skill.githubUrl,
+  programmingLanguage: 'Markdown',
+  runtimePlatform: ['Claude Code', 'Cursor', 'Codex'],
+  inLanguage: lang,
+  author: { '@type': 'Person', name: skill.source.owner, url: `https://github.com/${skill.source.owner}` },
+  ...(skill.updatedAt ? { dateModified: skill.updatedAt } : {}),
+  keywords: [skill.category, ...skill.tags].join(', '),
+};
+const panelHeading = 'mb-4 flex items-center gap-2 text-base font-semibold group-data-[tabs=ready]/tabs:sr-only';
 ---
-<BaseLayout lang={lang} title={skill.name} description={skill.description} path={localePath(lang, `/skills/${id}/`)}>
-  <h1>{skill.name}</h1><pre>{skill.install}</pre>
+<BaseLayout lang={lang} title={`${skill.name} — ${t.titleSuffix}`} description={skill.description} path={path} type="article" jsonLd={jsonLd}>
+  <article class="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-10">
+    <SkillHeader lang={lang} skill={skill} />
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-8">
+      <aside
+        aria-label={t.actions}
+        class="flex min-w-0 flex-col gap-6 lg:sticky lg:top-[calc(var(--topbar-height)+1rem)] lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100dvh-var(--topbar-height)-2rem)] lg:self-start lg:overflow-y-auto lg:p-0.5 lg:[scrollbar-width:thin]"
+      >
+        <InstallPanel lang={lang} skill={skill} />
+        <TableOfContents lang={lang} headings={headings} variant="side" class="hidden lg:block" />
+      </aside>
+
+      <section class="group/tabs min-w-0 lg:col-start-1 lg:row-start-1" aria-label={t.content} data-tabs>
+        <div role="tablist" aria-label={t.content} class="mb-5 flex gap-1 overflow-x-auto overflow-y-hidden shadow-[inset_0_-1px_0_var(--border)] [scrollbar-width:none]" data-tablist hidden>
+          {tabs.map((tab, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`sk-tab-${tab.key}`}
+              aria-controls={`sk-panel-${tab.key}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 border-transparent px-3 text-sm sm:px-4 font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground aria-selected:border-primary aria-selected:text-primary"
+              data-tab={tab.key}
+            >
+              <tab.icon class="size-4" aria-hidden="true" />{tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div class="flex flex-col gap-10 group-data-[tabs=ready]/tabs:gap-0">
+          <div id="sk-panel-skill" data-panel="skill" class="min-w-0">
+            <h2 class={panelHeading}><FileText class="size-4 text-primary" aria-hidden="true" />{t.tabSkill}</h2>
+            <TableOfContents lang={lang} headings={headings} variant="inline" class="mb-5 lg:hidden" />
+            <div class={`${card} px-4 py-5 sm:px-6 sm:py-6`}>
+              {html.trim() ? (
+                <div class="sk-prose" dir="auto" set:html={html} />
+              ) : (
+                <p class="text-sm text-muted-foreground">{t.emptyBody}</p>
+              )}
+            </div>
+          </div>
+
+          <div id="sk-panel-files" data-panel="files" class="min-w-0">
+            <h2 class={panelHeading}><FolderTree class="size-4 text-primary" aria-hidden="true" />{t.tabFiles}</h2>
+            <div class={`${card} p-2 sm:p-3`}>
+              <FileTree lang={lang} nodes={tree} texts={skill.texts} views={views} source={skill.source} root />
+            </div>
+          </div>
+
+          <div id="sk-panel-frontmatter" data-panel="frontmatter" class="min-w-0">
+            <h2 class={panelHeading}><Braces class="size-4 text-primary" aria-hidden="true" />{t.tabFrontmatter}</h2>
+            <div class={`${card} overflow-x-auto`}>
+              {frontmatter.length ? (
+                <table class="w-full text-sm">
+                  <thead class="bg-muted text-start">
+                    <tr>
+                      <th scope="col" class="px-4 py-2.5 text-start font-semibold">{t.key}</th>
+                      <th scope="col" class="px-4 py-2.5 text-start font-semibold">{t.value}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {frontmatter.map(([key, value]) => (
+                      <tr class="border-t border-border align-top">
+                        <th scope="row" class="px-4 py-3 text-start font-mono text-xs font-semibold whitespace-nowrap" dir="ltr">{key}</th>
+                        <td class="px-4 py-3">
+                          {typeof value === 'object' && value !== null ? (
+                            <pre class="font-mono text-xs leading-5 whitespace-pre-wrap break-words text-start" dir="ltr">{stringifyValue(value)}</pre>
+                          ) : (
+                            <p dir="auto" class="leading-6 break-words">{stringifyValue(value)}</p>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p class="p-4 text-sm text-muted-foreground">{t.noFrontmatter}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <p class="sr-only" role="status" aria-live="polite" data-live data-copied={t.copied} data-failed={t.copyFailed}></p>
+  </article>
 </BaseLayout>
+
+<script>
+  import '../../scripts/skill-page';
+</script>

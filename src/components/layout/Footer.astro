@@ -1,0 +1,77 @@
+---
+import Logo from '../Logo.astro';
+import { container } from './container';
+import { LICENSE_URL, REPO_URL, SAUDI_SOFT_URL, SKILLS_SH_PROFILE_URL } from './links';
+import { localePath } from '../../i18n';
+import { layoutStrings } from '../../i18n/strings/layout';
+import { getCatalog } from '../../lib/catalog';
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = layoutStrings[lang];
+const other: Lang = lang === 'ar' ? 'en' : 'ar';
+
+const generatedAt = getCatalog().generatedAt;
+const generatedDate = new Date(generatedAt);
+const hasDate = !Number.isNaN(generatedDate.getTime());
+// Gregorian calendar and Latin digits in both locales.
+const formattedDate = hasDate
+  ? new Intl.DateTimeFormat(lang === 'ar' ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', {
+      dateStyle: 'long',
+      timeZone: 'UTC',
+    }).format(generatedDate)
+  : '';
+
+const links = [
+  { href: REPO_URL, label: t.github },
+  { href: SKILLS_SH_PROFILE_URL, label: t.skillsSh },
+  { href: SAUDI_SOFT_URL, label: t.builtWith },
+];
+const linkClass =
+  'inline-flex min-h-11 items-center rounded-md text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline';
+---
+<footer class="mt-16 border-t border-border/30 bg-card">
+  <div class:list={[container, 'flex flex-col gap-6 py-8 md:flex-row md:items-start md:justify-between']}>
+    <div class="flex max-w-md flex-col gap-2">
+      <a href={localePath(lang, '/')} aria-label={t.homeAria} class="inline-flex w-fit items-center rounded-md text-foreground">
+        <Logo />
+      </a>
+      <p class="text-sm text-muted-foreground">{t.tagline}</p>
+      <p class="text-sm text-foreground">
+        {t.madeBy} <span class="font-semibold">{t.author}</span>{' '}
+        <span class="text-muted-foreground" aria-hidden="true">·</span>{' '}
+        <bdi class="text-muted-foreground" lang={other}>{layoutStrings[other].author}</bdi>
+      </p>
+    </div>
+
+    <nav aria-label={t.footerNav}>
+      <ul class="flex flex-wrap gap-x-6 md:flex-col md:gap-0">
+        {
+          links.map(({ href, label }) => (
+            <li>
+              <a href={href} class={linkClass}>{label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="border-t border-border/30">
+    <div class:list={[container, 'flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-4 text-xs text-muted-foreground']}>
+      <a href={LICENSE_URL} class="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline">
+        {t.license}
+      </a>
+      {
+        hasDate && (
+          <p>
+            {t.updated}: <time datetime={generatedAt}>{formattedDate}</time>
+          </p>
+        )
+      }
+    </div>
+  </div>
+</footer>

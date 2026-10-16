@@ -1,0 +1,11 @@
+---
+import type { HTMLTag } from 'astro/types';
+import { container } from './container';
+interface Props {
+  as?: HTMLTag;
+  class?: string;
+  [key: string]: unknown;
+}
+const { as: Tag = 'div', class: className, ...rest } = Astro.props;
+---
+<Tag class:list={[container, className]} {...rest}><slot /></Tag>

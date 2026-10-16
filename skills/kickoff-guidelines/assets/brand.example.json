@@ -1,0 +1,158 @@
+{
+  "name": "طوع نجد القابضة",
+  "nameLatin": "Tawa Najd Holding",
+  "title": "الدليل الإرشادي — طوع نجد القابضة",
+  "footerLabel": "الدليل الإرشادي للهوية — طوع نجد القابضة",
+  "year": "2026",
+  "motif": "najdi",
+  "logos": {
+    "stacked": {
+      "onLight": "~/Desktop/Project/tawa-najd/brand/logo/transparent/logo-stacked-green.svg",
+      "onDark": "~/Desktop/Project/tawa-najd/brand/logo/transparent/logo-stacked-white.svg"
+    },
+    "horizontal": {
+      "onLight": "~/Desktop/Project/tawa-najd/brand/logo/transparent/logo-horizontal-green.svg",
+      "onDark": "~/Desktop/Project/tawa-najd/brand/logo/transparent/logo-horizontal-white.svg"
+    },
+    "mark": "~/Desktop/Project/tawa-najd/brand/logo/transparent/mark-green.svg"
+  },
+  "colors": {
+    "scale": {
+      "50": "#F3FCF6", "100": "#DFF6E7", "200": "#B8EACB", "300": "#88D8AD", "400": "#54C08A",
+      "500": "#25935F", "600": "#1B8354", "700": "#166A45", "800": "#14573A", "900": "#104631"
+    }
+  },
+  "font": {
+    "family": "Kufam",
+    "nameAr": "كوفام",
+    "file": "~/Desktop/Project/tawa-najd/brand/fonts/kufam/Kufam[wght].ttf",
+    "googleFamily": "Kufam",
+    "source": "Google Fonts",
+    "license": "OFL"
+  },
+  "intro": {
+    "paragraphs": [
+      "«طوع نجد القابضة» ليست شعارًا يُوضع على ورقة، بل <b>هوية متكاملة</b> تُعرّف الشركة قبل أن يُقرأ اسمها.",
+      "هذا الدليل هو <b>المرجع الأساسي</b> لكل تصميم يحمل اسمنا: في العقد والفاتورة، وفي الموقع والتطبيق، وفي اللوحة والمنشور. الالتزام به يحفظ للشركة صورة واحدة ثابتة، ويبني الثقة مع شركائنا وعملائنا مع كل ظهور."
+    ]
+  },
+  "traits": {
+    "items": [
+      { "name": "الرسوخ النجدي", "text": "جذورنا في نجد: ثبات، وكلمة تُحفظ." },
+      { "name": "الثقة والوضوح", "text": "عقود واضحة، وأرقام صادقة، والتزام بالموعد." },
+      { "name": "التقنية الحديثة", "text": "نبني الأنظمة والتطبيقات بأدوات العصر." },
+      { "name": "الشراكة", "text": "نجاحنا يُبنى مع شركائنا لا على حسابهم." }
+    ]
+  },
+  "construction": {
+    "cols": 14,
+    "rows": 14,
+    "unit": 46.1816,
+    "origin": [51.746, 51.746],
+    "highlight": [6, 0],
+    "paragraphs": [
+      "العلامة مبنية على <b>شبكة مربعة من <span class=\"num\">14 × 14</span> وحدة</b>. الوحدة <b class=\"num\">X</b> هي سماكة الخط، وكل ضلع فيها مضاعف لها، وكل زاوية مشطوفة بزاوية <span class=\"num\">45°</span>.",
+      "تُقرأ العلامة <b>أربع طاءات</b> — طاء «طوع» — تلتف حول مركز واحد كما يلتقي الشركاء، وتتداخل مربعاتها كنقوش أبواب نجد وشُرَفها."
+    ]
+  },
+  "palette": {
+    "primaryName": "اللون الأساسي — أخضر طوع نجد",
+    "primaryCode": "Saudi Green 600",
+    "scaleLabel": "التدرج اللوني (من نفس الأخضر)",
+    "scalePrefix": "SA-",
+    "usage": [
+      { "label": "أبيض", "pct": 60, "color": "white" },
+      { "label": "أخضر", "pct": 30, "color": "600" },
+      { "label": "", "pct": 10, "color": "ink" }
+    ]
+  },
+  "typeface": {
+    "glyph": "طع",
+    "note": "ملاحظة: <b>كوفام</b> هو خط الشعار نفسه، والخط المعتمد للموقع والمستندات وكل ما يُكتب باسم الشركة، بالعربي والإنجليزي.",
+    "familySample": "طوع نجد",
+    "latinText": "الخط نفسه يحمل الحروف الإنجليزية، فالاسم الإنجليزي في الشعار والنصوص الإنجليزية كلها بكوفام. خط مجاني مفتوح المصدر من Google Fonts.",
+    "latinSample": ["TAWA NAJD HOLDING", "Rooted in Najd, built for today."]
+  },
+  "typeScale": {
+    "bodySample": "نص الموضوع: نبني لعملائنا الأنظمة والتطبيقات بإتقان، ونلتزم بالموعد والكلمة."
+  },
+  "patterns": { "gap": 0 },
+  "najdi": {
+    "dir": "~/Desktop/Project/tawa-najd/brand/patterns/najdi-triangles",
+    "label": "SVG: tawa-najd/brand/patterns/najdi-triangles/"
+  },
+  "elements": {
+    "items": [
+      { "kind": "teeth", "title": "الشُّرَف النجدية", "text": "مثلثات كأعالي جدران البيوت النجدية؛ تحد الترويسات والتذييلات." },
+      { "kind": "chamfer", "title": "الزوايا المشطوفة", "text": "زاوية 45° مأخوذة من العلامة؛ للأزرار والبطاقات والشرائط." },
+      { "kind": "gradient", "title": "التدرّج الأخضر", "text": "من الأخضر العميق إلى الأساسي، للأغلفة والترويسات." },
+      { "kind": "triangles", "title": "نقش المثلثات", "text": "نسيج خافت بنسبة شفافية لا تزيد عن 8% فوق الأخضر." }
+    ]
+  },
+  "letterhead": {
+    "image": "~/Desktop/Project/tawa-najd/brand/guidelines/assets/letterhead.png",
+    "heading": "ورق الشركة الرسمي",
+    "paragraphs": [
+      "ترويسة خضراء بالشعار الأبيض وحده، وشُرَف نجدية تحتها، وعلامة مائية مائلة من الشعار، وتذييل يحمل الرقم الموحد ووسائل التواصل.",
+      "خمسة نماذج جاهزة على نفس الورق: <b>عرض السعر، العقد، الفاتورة، الخطاب الرسمي، محضر الاجتماع</b>."
+    ]
+  },
+  "card": {
+    "name": "اسم الموظف",
+    "role": "المسمى الوظيفي",
+    "rows": [
+      { "icon": "phone", "text": "0555193348" },
+      { "icon": "globe", "text": "tawanajd.sa" },
+      { "icon": "map-pin", "text": "القصيم، المملكة العربية السعودية" }
+    ]
+  },
+  "banners": {
+    "items": [
+      {
+        "type": "hero",
+        "headline": ["شريكك التقني", "في القصيم"],
+        "text": "نبني الأنظمة والتطبيقات والمواقع بإتقان نجدي.",
+        "cta": "tawanajd.sa"
+      },
+      {
+        "type": "tiles",
+        "tiles": [
+          { "icon": "smartphone", "label": "التطبيقات" },
+          { "icon": "globe", "label": "المواقع" },
+          { "icon": "server", "label": "الأنظمة" },
+          { "icon": "shield-check", "label": "الاستضافة" }
+        ],
+        "headline": ["من الفكرة", "إلى الإطلاق"],
+        "text": "كل احتياجك التقني عند جهة واحدة.",
+        "cta": "اطلب عرض سعر"
+      },
+      {
+        "type": "phone",
+        "kicker": "قريبًا",
+        "headline": "مساعد المعلم",
+        "text": "اختبارات وواجبات وتقارير في دقائق، جنبًا إلى جنب مع منصة التعليم الموحد.",
+        "cta": "سجّل اهتمامك"
+      },
+      {
+        "type": "values",
+        "headline": "رسوخ نجد، وأدوات العصر",
+        "text": "شركة طوع نجد القابضة",
+        "values": ["الرسوخ", "الثقة", "التقنية", "الشراكة"]
+      },
+      {
+        "type": "contact",
+        "headline": "تواصل معنا",
+        "text": "نسعد بخدمتك في كل ما هو تقني.",
+        "rows": [
+          { "icon": "phone", "text": "0555193348" },
+          { "icon": "globe", "text": "tawanajd.sa" },
+          { "icon": "map-pin", "text": "Qassim, Saudi Arabia" }
+        ]
+      }
+    ]
+  },
+  "closing": {
+    "text": "ملفات الهوية الكاملة — الشعارات، وخط كوفام، والألوان، والأنماط النجدية، ونماذج المستندات — في مجلد <span class=\"num\">tawa-najd/brand</span>.",
+    "copyright": "© 2026 شركة طوع نجد القابضة · tawanajd.sa"
+  }
+}

@@ -1,0 +1,125 @@
+# CI only: type-check, build, and sanity-check the static output.
+# Deploys are done by Cloudflare Workers Builds (connected to this repo), not here,
+# so this workflow needs no Cloudflare secrets.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  WRANGLER_SEND_METRICS: "false"
+  ASTRO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  own-skills:
+    name: Validate skills/*/SKILL.md
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Frontmatter name == folder name, description present
+        run: |
+          node --input-type=module -e '
+          import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
+          import { join } from "node:path";
+          import { parse } from "yaml";
+
+          const root = "skills";
+          const dirs = existsSync(root)
+            ? readdirSync(root).filter((d) => statSync(join(root, d)).isDirectory())
+            : [];
+          const errors = [];
+          for (const dir of dirs) {
+            const file = join(root, dir, "SKILL.md");
+            if (!existsSync(file)) { errors.push(`${file}: missing`); continue; }
+            const match = readFileSync(file, "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/);
+            if (!match) { errors.push(`${file}: no YAML frontmatter`); continue; }
+            let fm;
+            try { fm = parse(match[1]) ?? {}; }
+            catch (e) { errors.push(`${file}: invalid YAML (${e.message})`); continue; }
+            if (fm.name !== dir) errors.push(`${file}: name "${fm.name}" != folder "${dir}"`);
+            if (typeof fm.description !== "string" || !fm.description.trim())
+              errors.push(`${file}: description is missing or empty`);
+          }
+          for (const e of errors) console.log(`::error::${e}`);
+          console.log(`${dirs.length} skill folder(s) checked, ${errors.length} error(s).`);
+          process.exit(errors.length ? 1 : 0);
+          '
+
+  build:
+    name: Check and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check (astro check)
+        run: npm run check
+
+      # Clones the source repos listed in catalog.yaml, builds the ZIPs, then runs astro build.
+      - name: Build
+        run: npm run build
+        env:
+          # Optional repository variable; astro.config.mjs falls back to localhost when empty.
+          SITE_URL: ${{ vars.SITE_URL }}
+
+      - name: Check the static output
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+
+          for f in dist/index.html dist/en/index.html dist/404.html dist/_headers dist/_redirects; do
+            [ -f "$f" ] || fail "$f is missing"
+          done
+
+          pages=$(find dist/skills -mindepth 2 -maxdepth 2 -name index.html 2>/dev/null | wc -l)
+          [ "$pages" -ge 1 ] || fail "no dist/skills/*/index.html pages were built"
+
+          zips=$(find dist/dl -maxdepth 1 -name '*.zip' 2>/dev/null | wc -l)
+          [ "$zips" -ge 1 ] || fail "no dist/dl/*.zip files were built"
+
+          # Workers free plan: 20,000 files per version. Keep a 1,000-file margin.
+          files=$(find dist -type f | wc -l)
+          echo "skill pages: $pages, zips: $zips, files in dist: $files"
+          [ "$files" -le 19000 ] || fail "dist has $files files (limit 19,000; Cloudflare free plan allows 20,000)"
+
+          # Workers static assets: 25 MiB per file.
+          big=$(find dist -type f -size +25M)
+          [ -z "$big" ] || fail "files over 25 MiB: $big"
+
+          {
+            echo "### Build output"
+            echo "| skill pages | zips | files in dist |"
+            echo "|---|---|---|"
+            echo "| $pages | $zips | $files |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Validates wrangler.jsonc and the asset manifest without credentials or uploading.
+      - name: Wrangler dry run
+        run: npx wrangler deploy --dry-run --outdir .cache/wrangler-dry

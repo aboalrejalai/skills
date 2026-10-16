@@ -1,0 +1,16 @@
+# Cloudflare Workers Static Assets redirects (copied by Astro from public/ to dist/).
+# Docs: https://developers.cloudflare.com/workers/static-assets/redirects/
+# Redirects run BEFORE assets are matched, so a rule here hides any page at the same path.
+# /index.html -> / needs no rule: html_handling "auto-trailing-slash" already does it.
+
+# Data files of the old GitHub Pages hub (skills.aboalrejal.com, archived at tag archive/v1-hub).
+/skills.json              /     301
+/skills_index.json        /     301
+/data/skills_index.json   /     301
+
+# There is no skills index page: each skill lives at /skills/<id>/. Remove these two
+# lines if a /skills/ (or /en/skills/) listing page is ever added.
+/skills                   /     301
+/skills/                  /     301
+/en/skills                /en/  301
+/en/skills/               /en/  301

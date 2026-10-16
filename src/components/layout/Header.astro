@@ -1,0 +1,149 @@
+---
+// Sticky 64px top bar. Desktop: logo, nav, language switch, theme capsule.
+// Below md: logo + a disclosure button that reveals the same items in a panel.
+import { ExternalLink, House, Languages, Menu, X } from '@lucide/astro';
+import Logo from '../Logo.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { container } from './container';
+import { REPO_URL } from './links';
+import { alternatePath, localePath } from '../../i18n';
+import { layoutStrings } from '../../i18n/strings/layout';
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+  /** Current page path, already locale-prefixed (same value BaseLayout receives). */
+  path: string;
+}
+const { lang, path } = Astro.props;
+const t = layoutStrings[lang];
+const other: Lang = lang === 'ar' ? 'en' : 'ar';
+const homeHref = localePath(lang, '/');
+const isHome = path === homeHref || path === homeHref.replace(/\/$/, '');
+const switchHref = alternatePath(lang, path);
+
+const navLink =
+  'inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-primary-subtle aria-[current=page]:text-primary';
+const langLink =
+  'inline-flex min-h-11 items-center gap-2 rounded-md border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5';
+---
+<header class="sticky top-0 z-40 border-b border-border/30 bg-card/85 backdrop-blur" data-site-header>
+  <div class:list={[container, 'flex h-[var(--topbar-height)] items-center gap-3']}>
+    <a href={homeHref} aria-label={t.homeAria} class="inline-flex min-h-11 min-w-0 items-center rounded-md text-foreground">
+      <Logo class="shrink-0" />
+    </a>
+
+    <nav aria-label={t.primaryNav} class="ms-4 hidden md:block">
+      <ul class="flex items-center gap-1">
+        <li>
+          <a href={homeHref} class={navLink} aria-current={isHome ? 'page' : undefined}>
+            <House size={16} aria-hidden="true" />
+            {t.home}
+          </a>
+        </li>
+        <li>
+          <a href={REPO_URL} class={navLink} aria-label={t.githubAria}>
+            {t.github}
+            <ExternalLink size={14} aria-hidden="true" class="rtl:-scale-x-100" />
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="ms-auto hidden items-center gap-2 md:flex">
+      <a href={switchHref} hreflang={other} lang={other} aria-label={t.switchLangAria} class={langLink}>
+        <Languages size={16} aria-hidden="true" />
+        {t.switchLang}
+      </a>
+      <ThemeToggle lang={lang} />
+    </div>
+
+    <button
+      type="button"
+      class="ms-auto inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md border border-border bg-card text-foreground transition-colors hover:bg-muted md:hidden"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label={t.menuOpen}
+      data-label-open={t.menuOpen}
+      data-label-close={t.menuClose}
+      data-menu-button
+    >
+      <Menu size={20} aria-hidden="true" data-icon-open />
+      <X size={20} aria-hidden="true" data-icon-close class="hidden" />
+    </button>
+  </div>
+
+  <div id="mobile-menu" hidden class="border-t border-border/30 bg-card md:hidden" data-menu-panel>
+    <div class:list={[container, 'flex flex-col gap-4 py-4']}>
+      <nav aria-label={t.primaryNav}>
+        <ul class="flex flex-col gap-1">
+          <li>
+            <a href={homeHref} class:list={[navLink, 'w-full']} aria-current={isHome ? 'page' : undefined}>
+              <House size={16} aria-hidden="true" />
+              {t.home}
+            </a>
+          </li>
+          <li>
+            <a href={REPO_URL} class:list={[navLink, 'w-full']} aria-label={t.githubAria}>
+              {t.github}
+              <ExternalLink size={14} aria-hidden="true" class="rtl:-scale-x-100" />
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-border/30 pt-4">
+        <a href={switchHref} hreflang={other} lang={other} aria-label={t.switchLangAria} class={langLink}>
+          <Languages size={16} aria-hidden="true" />
+          {t.switchLang}
+        </a>
+        <ThemeToggle lang={lang} />
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const button = header?.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const panel = header?.querySelector<HTMLElement>('[data-menu-panel]');
+
+  if (header && button && panel) {
+    const iconOpen = button.querySelector('[data-icon-open]');
+    const iconClose = button.querySelector('[data-icon-close]');
+    const desktop = window.matchMedia('(min-width: 48rem)');
+
+    const isOpen = () => button.getAttribute('aria-expanded') === 'true';
+
+    const setOpen = (open: boolean, { restoreFocus = false } = {}) => {
+      button.setAttribute('aria-expanded', String(open));
+      button.setAttribute('aria-label', (open ? button.dataset.labelClose : button.dataset.labelOpen) ?? '');
+      panel.hidden = !open;
+      iconOpen?.classList.toggle('hidden', open);
+      iconClose?.classList.toggle('hidden', !open);
+      if (open) panel.querySelector<HTMLElement>('a, button')?.focus();
+      else if (restoreFocus) button.focus();
+    };
+
+    button.addEventListener('click', () => setOpen(!isOpen()));
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen()) {
+        event.preventDefault();
+        setOpen(false, { restoreFocus: true });
+      }
+    });
+
+    // Close when focus or a click leaves the header.
+    document.addEventListener('click', (event) => {
+      if (isOpen() && !header.contains(event.target as Node)) setOpen(false);
+    });
+    header.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget as Node | null;
+      if (isOpen() && next && !header.contains(next)) setOpen(false);
+    });
+
+    desktop.addEventListener('change', (event) => {
+      if (event.matches && isOpen()) setOpen(false);
+    });
+  }
+</script>

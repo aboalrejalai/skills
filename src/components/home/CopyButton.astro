@@ -1,0 +1,21 @@
+---
+// Icon button that copies `text` (wired by src/scripts/home-search.ts via [data-copy]).
+import { Check, Copy } from '@lucide/astro';
+
+interface Props {
+  text: string;
+  label: string;
+}
+const { text, label } = Astro.props;
+---
+
+<button
+  type="button"
+  data-copy={text}
+  aria-label={label}
+  title={label}
+  class="group/copy relative z-10 inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary pointer-coarse:size-11"
+>
+  <Copy class="size-4 group-data-[copied]/copy:hidden" />
+  <Check class="hidden size-4 text-primary group-data-[copied]/copy:block" />
+</button>

@@ -1,0 +1,49 @@
+{
+  "skill_name": "aboalrejal-docs",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "سو لي عرض سعر باسمي لمؤسسة النخبة للتدريب (سجلها 1010123456، الرياض) على موقع تعريفي مع لوحة تحكم لإدارة الدورات والتسجيل. السعر 18 ألف، دفعتين 50 و50: الأولى عند اعتماد العرض والثانية عند التسليم، المدة 6 أسابيع، صلاحية العرض 30 يوم.",
+      "expected_output": "Quote on his paper: client card with CR and city, provider card with his name, Riyadh, phone, email; scope items written from the brief; one «الإجمالي» row of 18,000 with matching Arabic words and no VAT lines; payments 9,000 due on approval and 9,000 due on delivery; duration and validity note; signatures with no stamp box on his side; HTML + PDF, built without a round of questions because the prompt carries every checklist item.",
+      "files": [],
+      "assertions": [
+        "HTML and PDF were both produced",
+        "Carries his logo file (not a redrawn one) and his footer: phone +966 53 354 8021, aboalrejal.com, aboalrejal.ai@gmail.com, LinkedIn, GitHub, X",
+        "Uses the brand primary green #1B8354",
+        "Number is MA-Q-001 (or the next free MA-Q number)",
+        "Prints no VAT lines and states he is not VAT-registered",
+        "Never labels the document as a test or sample (تجريبي/نموذج)",
+        "Total 18,000 with payments 9,000 and 9,000",
+        "Payments fall due «عند اعتماد العرض» and «عند التسليم», as given",
+        "Client CR 1010123456 appears"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "اكتب عقد عمل حر بيني وبين شركة الأفق الرقمي (سجل 1010654321، الرياض) لتطوير تطبيق جوال بقيمة 40 ألف على ثلاث دفعات.",
+      "expected_output": "Before any file exists: one Arabic message asking for every missing item, including his national ID number for the contract, the client's representative, the duration, the payment split, and the date. No JSON, HTML or PDF is created until the answers arrive.",
+      "files": [],
+      "assertions": [
+        "No document file is created before the owner answers",
+        "Asks for his national ID number for this contract",
+        "Asks all missing items in one numbered Arabic message",
+        "Does not read an ID number from any file or invent one"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "طلع فاتورة باسمي لشركة الأفق الرقمي (سجلها 1010654321، الرياض) على الدفعة الأولى 16 ألف من العقد MA-C-001 لتطوير تطبيق جوال، تاريخ الفاتورة والتوريد اليوم والاستحقاق بعد أسبوعين، الدفع تحويل بنكي ولا تطبع بيانات الحساب.",
+      "expected_output": "Invoice titled «فاتورة» (not «فاتورة ضريبية») with vatRate 0: client card with CR 1010654321 and Riyadh; one line for the first payment of the mobile-app contract, 16,000; one total row of 16,000 and matching words; reference MA-C-001; issue and supply dates today, due date two weeks later; payment method «تحويل بنكي» with no bank details; his signature box without a stamp; and one remark that a printed invoice does not replace ZATCA e-invoicing. Built without a round of questions because the prompt carries every checklist item.",
+      "files": [],
+      "assertions": [
+        "HTML and PDF were both produced",
+        "Title is «فاتورة», never «فاتورة ضريبية»",
+        "Total 16,000 with no VAT added",
+        "References MA-C-001",
+        "Client CR 1010654321 appears",
+        "Prints no IBAN or bank details unless the owner supplied them",
+        "Mentions once that it does not replace ZATCA e-invoicing"
+      ]
+    }
+  ]
+}

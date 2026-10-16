@@ -1,0 +1,84 @@
+{
+  "name": "⟨brand name as written in Arabic text⟩",
+  "nameLatin": "⟨Latin name⟩",
+  "footerLabel": "الدليل الإرشادي للهوية — ⟨name⟩",
+  "year": "⟨year⟩",
+  "motif": "⟨najdi or none⟩",
+  "logos": {
+    "stacked": { "onLight": "⟨path to the stacked logo for light backgrounds⟩", "onDark": "⟨path, for green or dark backgrounds⟩" },
+    "horizontal": { "onLight": "⟨path to the horizontal logo for light backgrounds⟩", "onDark": "⟨path, for green or dark backgrounds⟩" },
+    "mark": "⟨path to the mark alone, one colour⟩"
+  },
+  "colors": {
+    "scale": {
+      "50": "⟨#RRGGBB⟩", "100": "⟨#RRGGBB⟩", "200": "⟨#RRGGBB⟩", "300": "⟨#RRGGBB⟩", "400": "⟨#RRGGBB⟩",
+      "500": "⟨#RRGGBB⟩", "600": "⟨#RRGGBB, the primary (logo colour)⟩", "700": "⟨#RRGGBB⟩", "800": "⟨#RRGGBB⟩", "900": "⟨#RRGGBB⟩"
+    }
+  },
+  "font": {
+    "family": "⟨CSS family name; it must have Arabic letters⟩",
+    "nameAr": "⟨the family's name in Arabic⟩",
+    "file": "⟨path to a TTF or OTF to embed; delete this line to use googleFamily⟩",
+    "googleFamily": "⟨Google Fonts family; delete this line when file is given⟩",
+    "source": "⟨where the font comes from, e.g. Google Fonts⟩",
+    "license": "⟨licence from scripts/fonts.py or from the owner, e.g. OFL⟩"
+  },
+  "intro": {
+    "title": "⟨هويتنا أكثر من شعار for a company, هويتي أكثر من شعار for a person⟩",
+    "paragraphs": ["⟨what the identity is, from the owner's sources⟩", "⟨that this deck is the reference every design follows⟩"]
+  },
+  "traits": {
+    "items": [
+      { "name": "⟨trait⟩", "text": "⟨one sentence, traceable to a source⟩" },
+      { "name": "⟨trait⟩", "text": "⟨one sentence⟩" },
+      { "name": "⟨trait⟩", "text": "⟨one sentence⟩" },
+      { "name": "⟨trait, or delete this item for three⟩", "text": "⟨one sentence⟩" }
+    ]
+  },
+  "construction": {
+    "paragraphs": ["⟨the grid, from markgeo.py's report⟩", "⟨what the mark reads as, from what you saw⟩"]
+  },
+  "palette": {
+    "primaryName": "اللون الأساسي — ⟨colour name⟩",
+    "primaryCode": "⟨Latin name of the colour⟩"
+  },
+  "typeface": {
+    "glyph": "⟨two letters drawn huge on slide 07, usually the name's first⟩",
+    "note": "⟨where the font is used; only real uses⟩",
+    "familySample": "⟨a word of about nine letters set in every weight⟩",
+    "latinText": "⟨a paragraph on the Latin face⟩",
+    "latinSample": ["⟨NAME IN CAPITALS⟩", "⟨tagline from a source⟩"]
+  },
+  "typeScale": { "bodySample": "نص الموضوع: ⟨one sentence in the brand's voice⟩" },
+  "najdi": { "label": "SVG: ⟨folder of the Najdi SVGs⟩" },
+  "elements": {
+    "items": [
+      { "kind": "⟨teeth, chamfer, gradient, triangles or pattern⟩", "title": "⟨element⟩", "text": "⟨one line; claim a source only when true⟩" },
+      { "kind": "⟨kind⟩", "title": "⟨element⟩", "text": "⟨one line⟩" },
+      { "kind": "⟨kind⟩", "title": "⟨element⟩", "text": "⟨one line⟩" }
+    ]
+  },
+  "letterhead": {
+    "image": "⟨picture of the letterhead; delete the whole letterhead block when there is none⟩",
+    "heading": "⟨heading⟩",
+    "paragraphs": ["⟨what the picture shows⟩", "⟨which documents use it⟩"]
+  },
+  "card": {
+    "name": "⟨whose card: a person's name⟩",
+    "role": "⟨their role⟩",
+    "rows": [{ "icon": "phone", "text": "⟨phone⟩" }, { "icon": "globe", "text": "⟨website⟩" }, { "icon": "map-pin", "text": "⟨city, Arabic last⟩" }]
+  },
+  "banners": {
+    "items": [
+      { "type": "hero", "headline": ["⟨line⟩", "⟨line⟩"], "text": "⟨fact from a source⟩", "cta": "⟨button⟩" },
+      { "type": "tiles", "tiles": [{ "icon": "⟨lucide name⟩", "label": "⟨service⟩" }, { "icon": "⟨lucide name⟩", "label": "⟨service⟩" }, { "icon": "⟨lucide name⟩", "label": "⟨service⟩" }, { "icon": "⟨lucide name⟩", "label": "⟨service⟩" }], "headline": ["⟨line⟩", "⟨line⟩"], "text": "⟨fact⟩", "cta": "⟨button⟩" },
+      { "type": "phone", "kicker": "⟨kicker⟩", "headline": "⟨product or project⟩", "text": "⟨fact⟩", "cta": "⟨button⟩" },
+      { "type": "values", "headline": "⟨slogan from a source, not the name the logo already shows⟩", "text": "⟨subline⟩", "values": ["⟨word⟩", "⟨word⟩", "⟨word⟩", "⟨word⟩"] },
+      { "type": "contact", "headline": "⟨تواصل معنا or تواصل معي⟩", "text": "⟨line⟩", "rows": [{ "icon": "phone", "text": "⟨phone⟩" }, { "icon": "globe", "text": "⟨website⟩" }] }
+    ]
+  },
+  "closing": {
+    "text": "⟨where the identity files live⟩",
+    "copyright": "© ⟨year⟩ ⟨name⟩ · ⟨website⟩"
+  }
+}

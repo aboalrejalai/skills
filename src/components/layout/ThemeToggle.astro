@@ -1,0 +1,98 @@
+---
+// Saudi Soft theme capsule: light / dark / system. Several instances can live on one page
+// (desktop header + mobile menu); the script keeps them all in sync.
+import { Monitor, Moon, Sun } from '@lucide/astro';
+import { layoutStrings } from '../../i18n/strings/layout';
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+  class?: string;
+}
+const { lang, class: className } = Astro.props;
+const t = layoutStrings[lang];
+
+const options = [
+  { mode: 'light', label: t.themeLight, icon: Sun },
+  { mode: 'dark', label: t.themeDark, icon: Moon },
+  { mode: 'system', label: t.themeSystem, icon: Monitor },
+] as const;
+---
+<div
+  role="group"
+  aria-label={t.theme}
+  data-theme-toggle
+  class:list={['inline-flex items-center gap-1 rounded-full border border-border/50 bg-muted/50 p-1', className]}
+>
+  {
+    options.map(({ mode, label, icon: Icon }) => (
+      <button
+        type="button"
+        data-theme-option={mode}
+        aria-pressed={mode === 'system' ? 'true' : 'false'}
+        aria-label={label}
+        title={label}
+        class="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:ring-2 aria-pressed:ring-primary md:size-8"
+      >
+        <Icon size={16} aria-hidden="true" />
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  type Mode = 'light' | 'dark' | 'system';
+  const KEY = 'theme';
+  const root = document.documentElement;
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function read(): Mode {
+    try {
+      const value = localStorage.getItem(KEY);
+      if (value === 'light' || value === 'dark') return value;
+    } catch {
+      /* storage blocked: fall back to system */
+    }
+    return 'system';
+  }
+
+  function write(mode: Mode) {
+    try {
+      if (mode === 'system') localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, mode);
+    } catch {
+      /* storage blocked: the choice lasts for this page only */
+    }
+  }
+
+  function apply(mode: Mode) {
+    const dark = mode === 'dark' || (mode === 'system' && media.matches);
+    root.classList.toggle('dark', dark);
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-option]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.themeOption === mode));
+    });
+  }
+
+  let mode = read();
+  apply(mode);
+
+  document.addEventListener('click', (event) => {
+    const button = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-theme-option]');
+    if (!button) return;
+    mode = button.dataset.themeOption as Mode;
+    write(mode);
+    apply(mode);
+  });
+
+  media.addEventListener('change', () => {
+    if (mode === 'system') apply(mode);
+  });
+
+  // Keep other open tabs in step.
+  window.addEventListener('storage', (event) => {
+    if (event.key !== KEY && event.key !== null) return;
+    mode = read();
+    apply(mode);
+  });
+</script>

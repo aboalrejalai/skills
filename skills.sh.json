@@ -1,0 +1,27 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Kickoff workflow",
+      "description": "A plan-to-merge line for coding agents: plan risk-rated tasks, implement them on a branch, review against the plan, ship after the owner approves, plus a brand guidelines deck builder.",
+      "skills": [
+        "kickoff-setup",
+        "kickoff-plan",
+        "kickoff-implement",
+        "kickoff-review",
+        "kickoff-ship",
+        "kickoff-using",
+        "kickoff-guidelines"
+      ]
+    },
+    {
+      "title": "Documents",
+      "description": "Official printable A4 documents (HTML + PDF): quotes, contracts, invoices, letters and minutes, on Tawa Najd's or Mohammed Abo Alrejal's own letterhead.",
+      "skills": [
+        "tawa-najd",
+        "aboalrejal-docs"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+---
+// Recursive file tree. Folders and text files are <details> (works without JS); text files open
+// into a server-rendered code viewer from `texts`; binary files list their size only.
+// OWNER: skill-page agent (A8).
+import { ChevronDown, Copy, ExternalLink, File, FileCode, FileText, Folder } from '@lucide/astro';
+import { skillStrings } from '../../i18n/strings/skill';
+import { highlightCode, langFromPath } from '../../lib/markdown';
+import type { Lang, SkillSource } from '../../lib/types';
+import { fileDomId, formatBytes, type FileView, type TreeNode } from './format';
+
+interface Props {
+  lang: Lang;
+  nodes: TreeNode[];
+  texts: Record<string, string>;
+  /** How each text file is shown (see planFileViews); files missing here link to GitHub. */
+  views: Map<string, FileView>;
+  source: SkillSource;
+  root?: boolean;
+}
+const { lang, nodes, texts, views, source, root = false } = Astro.props;
+const t = skillStrings[lang];
+const blobUrl = (p: string) =>
+  `https://github.com/${source.owner}/${source.repo}/blob/${source.ref}/${[source.path, p].filter(Boolean).join('/')}`;
+const row = 'flex min-h-11 items-center gap-2 rounded-md px-2 text-sm';
+const summaryRow = `${row} cursor-pointer hover:bg-muted`;
+const fileIcon = (p: string) => (langFromPath(p) === 'markdown' || langFromPath(p) === 'text' ? 'file-text' : 'file-code');
+// Tree rows repeat the same few icons hundreds of times, so they reference one sprite instead of inlining SVGs.
+const icon = (name: string) => `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><use href="#sk-i-${name}"/></svg>`;
+const sprite = { chev: ChevronDown, folder: Folder, file: File, 'file-text': FileText, 'file-code': FileCode, external: ExternalLink, copy: Copy } as const;
+---
+{root && (
+  <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+    {Object.entries(sprite).map(([name, Icon]) => (
+      <symbol id={`sk-i-${name}`} viewBox="0 0 24 24"><Icon /></symbol>
+    ))}
+  </svg>
+)}
+<ul class:list={['flex flex-col', root && 'sk-tree']}>
+  {nodes.map((node) =>
+    node.kind === 'folder' ? (
+      <li>
+        <details open>
+          <summary class={summaryRow}>
+            <span class="sk-chev flex size-4 shrink-0 text-muted-foreground" set:html={icon('chev')} />
+            <span class="flex size-4 shrink-0 text-primary" set:html={icon('folder')} />
+            <bdi class="min-w-0 truncate font-medium">{node.name}/</bdi>
+            <span class="ms-auto shrink-0 text-xs text-muted-foreground">{t.fileCount(node.count)}</span>
+          </summary>
+          <Astro.self lang={lang} nodes={node.children} texts={texts} views={views} source={source} />
+        </details>
+      </li>
+    ) : node.file.binary ? (
+      <li class={`${row} text-muted-foreground`}>
+        <span class="size-4 shrink-0" aria-hidden="true" />
+        <span class="flex size-4 shrink-0" set:html={icon('file')} />
+        <bdi class="min-w-0 truncate">{node.name}</bdi>
+        <span class="ms-auto shrink-0 text-xs" dir="auto">{t.binary} · {formatBytes(node.file.size, lang)}</span>
+      </li>
+    ) : (views.get(node.file.path) ?? 'link') === 'link' ? (
+      <li class={`${row} text-muted-foreground`}>
+        <span class="size-4 shrink-0" aria-hidden="true" />
+        <span class="flex size-4 shrink-0" set:html={icon('file-text')} />
+        <bdi class="min-w-0 truncate">{node.name}</bdi>
+        <span class="ms-auto shrink-0 text-xs" dir="auto">{formatBytes(node.file.size, lang)}</span>
+        <a href={blobUrl(node.file.path)} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-md px-1 text-xs font-medium text-primary hover:underline">
+          GitHub<span class="flex size-3.5 rtl:-scale-x-100" set:html={icon('external')} /><span class="sr-only">: {node.file.path} {t.opensExternal}</span>
+        </a>
+      </li>
+    ) : (
+      <li>
+        <details id={fileDomId(node.file.path)} class="sk-file">
+          <summary class={summaryRow}>
+            <span class="sk-chev flex size-4 shrink-0 text-muted-foreground" set:html={icon('chev')} />
+            <span class="flex size-4 shrink-0 text-muted-foreground" set:html={icon(fileIcon(node.file.path))} />
+            <bdi class="min-w-0 truncate">{node.name}</bdi>
+            <span class="ms-auto shrink-0 text-xs text-muted-foreground" dir="auto">{formatBytes(node.file.size, lang)}</span>
+          </summary>
+          <div class="sk-viewer code-block my-2 ms-2" dir="ltr">
+            <div class="code-head">
+              <span class="min-w-0 truncate">{node.file.path}</span>
+              <span class="flex shrink-0 items-center">
+                <a href={blobUrl(node.file.path)} target="_blank" rel="noopener noreferrer" class="code-copy" aria-label={`${t.openOnGithub}: ${node.file.path}`} title={t.openOnGithub}>
+                  <span class="flex size-4" set:html={icon('external')} />
+                </a>
+                <button type="button" class="code-copy" data-copy-code aria-label={`${t.copy}: ${node.file.path}`} title={t.copy} hidden>
+                  <span class="flex size-4" set:html={icon('copy')} />
+                </button>
+              </span>
+            </div>
+            {views.get(node.file.path) === 'highlight' ? (
+              <Fragment set:html={highlightCode(texts[node.file.path], langFromPath(node.file.path))} />
+            ) : (
+              <pre class="sk-plain" tabindex="0"><code>{texts[node.file.path]}</code></pre>
+            )}
+          </div>
+        </details>
+      </li>
+    ),
+  )}
+</ul>

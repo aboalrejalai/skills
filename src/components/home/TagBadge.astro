@@ -1,0 +1,26 @@
+---
+// Soft outline status badge for a catalog tag. The label stays text-foreground for contrast;
+// the tint and the icon carry the tag colour.
+import { Hammer, Star, ThumbsUp, Wrench } from '@lucide/astro';
+import { TAG_LABELS } from '../../i18n';
+import type { Lang, Tag } from '../../lib/types';
+
+interface Props {
+  tag: Tag;
+  lang: Lang;
+}
+const { tag, lang } = Astro.props;
+
+const STYLES = {
+  made: { icon: Hammer, badge: 'border-primary/30 bg-primary/10', tint: 'text-primary' },
+  use: { icon: Wrench, badge: 'border-info/30 bg-info/10', tint: 'text-info' },
+  recommend: { icon: ThumbsUp, badge: 'border-success/30 bg-success/10', tint: 'text-success' },
+  favorite: { icon: Star, badge: 'border-warning/30 bg-warning/10', tint: 'text-warning' },
+} as const;
+const { icon: Icon, badge, tint } = STYLES[tag];
+---
+
+<span class:list={['inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium text-foreground', badge]}>
+  <Icon class:list={['size-3.5 shrink-0', tint]} aria-hidden="true" />
+  {TAG_LABELS[tag][lang]}
+</span>

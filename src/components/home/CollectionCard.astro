@@ -1,0 +1,75 @@
+---
+// Card for a whole repo shown as one entry (e.g. a 975-skill pack). Visually distinct from SkillCard:
+// dashed border, stacked-boxes tile, a skill-count badge, and a browse link instead of a skill page.
+import { Boxes, ExternalLink } from '@lucide/astro';
+import { CATEGORY_LABELS } from '../../i18n';
+import { fill, homeStrings } from '../../i18n/strings/home';
+import type { CollectionEntry, Lang } from '../../lib/types';
+import { TAG_ORDER } from './catalog-view';
+import CopyButton from './CopyButton.astro';
+import TagBadge from './TagBadge.astro';
+
+interface Props {
+  collection: CollectionEntry;
+  lang: Lang;
+  search: string;
+}
+const { collection, lang, search } = Astro.props;
+const t = homeStrings[lang];
+const tags = TAG_ORDER.filter((tag) => collection.tags.includes(tag));
+const repo = `${collection.source.owner}/${collection.source.repo}`;
+const title = collection.title[lang];
+---
+
+<li
+  data-item
+  data-kind="collection"
+  data-tags={collection.tags.join(' ')}
+  data-cat={collection.category}
+  data-src={collection.own ? 'mine' : 'others'}
+  data-search={search}
+  class="h-full"
+>
+  <article class="flex h-full flex-col gap-3 rounded-xl border border-dashed border-primary/40 bg-card p-5 transition-colors hover:border-primary/60 hover:bg-primary/5">
+    <div class="flex items-start gap-3">
+      <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <Boxes class="size-5" />
+      </div>
+      <div class="min-w-0 flex-1">
+        <h3 class="font-semibold leading-snug">{title}</h3>
+        <p class="mt-0.5 text-xs text-muted-foreground">
+          {t.collection} · {CATEGORY_LABELS[collection.category][lang]}
+        </p>
+      </div>
+      <span class="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-semibold tabular-nums text-foreground">
+        {fill(t.collectionCount, { count: collection.skillCount })}
+      </span>
+    </div>
+
+    <p class="line-clamp-2 text-sm text-muted-foreground">{collection.description[lang]}</p>
+
+    {tags.length > 0 && (
+      <ul class="flex flex-wrap gap-1.5" aria-label={t.tagsLabel}>
+        {tags.map((tag) => <li><TagBadge tag={tag} lang={lang} /></li>)}
+      </ul>
+    )}
+
+    <div class="mt-auto flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
+      <p class="w-full truncate font-mono text-xs text-muted-foreground">
+        <span class="sr-only">{t.sourceLabel}:</span>
+        <span dir="ltr">{repo}</span>
+      </p>
+      <a
+        href={collection.githubUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover pointer-coarse:h-11"
+      >
+        {t.browseCollection}
+        <ExternalLink class="size-4" />
+        <span class="sr-only">{t.opensInNewTab}</span>
+      </a>
+      <CopyButton text={collection.install} label={`${t.copyList}: ${title}`} />
+    </div>
+  </article>
+</li>

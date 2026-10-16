@@ -1,0 +1,21 @@
+---
+// Soft KPI card: gradient tint, muted label with icon, bold value, optional caption.
+import type { AstroComponent } from '@lucide/astro';
+
+interface Props {
+  icon: AstroComponent;
+  label: string;
+  value: number;
+  caption?: string;
+}
+const { icon: Icon, label, value, caption } = Astro.props;
+---
+
+<div class="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/10 to-transparent p-4 sm:p-5">
+  <dt class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+    <Icon class="size-5 shrink-0 text-primary" />
+    {label}
+  </dt>
+  <dd class="mt-1 text-2xl font-bold tabular-nums sm:text-3xl">{value.toLocaleString('en-US')}</dd>
+  {caption && <dd class="mt-1 text-xs text-muted-foreground">{caption}</dd>}
+</div>

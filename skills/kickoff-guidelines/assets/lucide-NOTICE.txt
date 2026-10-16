@@ -1,0 +1,6 @@
+lucide-0.469.0.json holds the icon shapes of Lucide 0.469.0 (https://lucide.dev),
+extracted from https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js as
+{"kebab-name": "<svg child elements>"} so decks render icons without network.
+
+Lucide is distributed under the ISC License. Portions of Lucide derive from
+Feather (Cole Bemis, MIT License). Copyright for Lucide is held by Lucide Contributors.

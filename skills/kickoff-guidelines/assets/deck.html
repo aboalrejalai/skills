@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="__LANG__" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>__TITLE__</title>
+<style>
+__FONT_FACE__
+  :root {
+__ROOT_VARS__
+  }
+  @page { size: 1440px 810px; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--canvas); }
+  body { font-family: var(--text); color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .latin { font-family: var(--latin); direction: ltr; unicode-bidi: isolate; }
+
+  .slide {
+    position: relative; width: 1440px; height: 810px; overflow: hidden;
+    margin: 0 auto 24px; background: var(--c-50); break-after: page;
+  }
+  @media print { .slide { margin: 0; } html, body { background: #fff; } }
+  .slide.dark { background: linear-gradient(135deg, var(--c-900) 0%, var(--c-700) 55%, var(--c-600) 100%); color: #fff; }
+
+  /* Frame and footer of the inner pages */
+  .frame { position: absolute; inset: 22px; border: 1.5px solid var(--c-200); border-radius: 14px; pointer-events: none; }
+  .dark .frame { border-color: rgba(255,255,255,.18); }
+  .foot { position: absolute; bottom: 34px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--muted); }
+  .dark .foot { color: var(--c-200); }
+  .foot .brand { display: flex; align-items: center; gap: 10px; }
+  .foot svg { width: 22px; height: 22px; }
+  .foot .no { font-family: var(--latin); font-weight: 600; letter-spacing: 1px; }
+  /* Footer parts that sit on a green panel (type slides) turn light, so they stay legible */
+  .foot.panel-right .brand, .foot.panel-left .no { color: var(--c-100); }
+
+  /* Page title with the crenellations (or a bar) under it */
+  .title { position: absolute; top: 58px; left: 0; right: 0; text-align: center; }
+  .title h2 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 46px; color: var(--c-700); line-height: 1.3; }
+  .dark .title h2 { color: #fff; }
+  .teeth { display: block; margin: 10px auto 0; width: 150px; height: 12px; }
+  .title .kicker { display: block; font-size: 17px; color: var(--c-500); font-weight: 500; margin-bottom: 4px; letter-spacing: .3px; }
+  .dark .title .kicker { color: var(--c-300); }
+
+  .body { position: absolute; top: 190px; bottom: 90px; left: 90px; right: 90px; }
+  p.lead { font-size: 25px; line-height: 1.9; color: var(--ink-2); margin: 0; }
+  .dark p.lead { color: var(--c-100); }
+  .muted { color: var(--muted); }
+  .num { font-family: var(--latin); direction: ltr; unicode-bidi: isolate; }
+  .rich b { color: var(--c-700); }
+  .rich strong { font-weight: 700; }
+
+  .card { background: #fff; border-radius: 22px; border: 1.5px solid var(--c-100); }
+  .cap { font-size: 21px; font-weight: 500; color: var(--c-800); text-align: center; margin-top: 18px; }
+  .dark .cap { color: #fff; }
+  .bad { position: relative; }
+  .bad::before, .bad::after { content: ""; position: absolute; top: 14px; left: 14px; width: 30px; height: 4px; background: var(--danger); border-radius: 2px; z-index: 2; }
+  .bad::before { transform: translateY(13px) rotate(45deg); left: 14px; }
+  .bad::after { transform: translateY(13px) rotate(-45deg); }
+  .ghost { position: absolute; opacity: .07; }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+
+<script>
+/* kickoff-guidelines deck engine. Every brand string, colour, logo and contact comes from B
+   (brand.json merged over assets/defaults.json by scripts/build.py); nothing brand-specific lives here. */
+const B = /*__DATA__*/null;
+const ICONS = /*__ICONS__*/{};
+
+const C = B.colors.scale;                       // "50" … "900"; "600" is the primary (logo colour)
+const INK = B.colors.ink, HL = B.colors.highlight;
+const K = (k) => k === "white" ? "#fff" : k === "ink" ? INK : (C[k] || k);
+const NAJDI = B.motif === "najdi";
+const WEIGHT_WORDS = { 2: "وزنان", 3: "ثلاثة أوزان", 4: "أربعة أوزان", 5: "خمسة أوزان", 6: "ستة أوزان", 7: "سبعة أوزان", 8: "ثمانية أوزان", 9: "تسعة أوزان" };
+const W = B.typeface.weights;
+const TOK = {
+  year: B.year, name: B.name, nameLatin: B.nameLatin, font: B.font.family, fontAr: B.font.nameAr,
+  cells: B.construction && B.construction.cols, minPrint: B.clearSpace.minPrint, minScreen: B.clearSpace.minScreen,
+  weightsWord: WEIGHT_WORDS[W.length] || `${W.length} أوزان`, firstWeight: W[0][1], lastWeight: W[W.length - 1][1],
+};
+const fmt = (s) => String(s ?? "").replace(/\{(\w+)\}/g, (m, k) => (k in TOK ? TOK[k] : m));
+const lines = (v) => Array.isArray(v) ? v.join("<br>") : v;
+
+/* The mark, inline: its own path(s) and viewBox, filled with any colour. */
+const VB = B.mark.viewBox;
+const VBW = Number(VB.split(/\s+/)[2]);
+const markPaths = (attrs) => B.mark.paths.map((p) => `<path d="${p.d}" ${attrs} fill-rule="${p.rule}"/>`).join("");
+const mark = (fill, extra = "") => `<svg viewBox="${VB}" ${extra}>${markPaths(`fill="${fill}"`)}</svg>`;
+
+/* Lucide line icons, inlined at build time (no network at render). */
+const icon = (name, style = "") => `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${name}" style="${style}">${ICONS[name] || ""}</svg>`;
+
+/* Najdi crenellations; with "motif": "none" a short bar replaces the title teeth and bands lose their teeth. */
+const teeth = (color = C[600], n = 9) => {
+  if (!NAJDI) return `<svg class="teeth" viewBox="0 0 150 12"><rect x="45" y="4" width="60" height="4" rx="2" fill="${color}"/></svg>`;
+  let d = ""; const w = 150 / n;
+  for (let i = 0; i < n; i++) d += `M${i * w} 0 L${i * w + w / 2} 12 L${(i + 1) * w} 0 Z `;
+  return `<svg class="teeth" viewBox="0 0 150 12"><path d="${d}" fill="${color}"/></svg>`;
+};
+const teethRow = (w, h, color, up = false) => {
+  if (!NAJDI) return "";
+  const n = Math.round(w / (h * 2)), s = w / n; let d = "";
+  for (let i = 0; i < n; i++) d += up ? `M${i * s} ${h} L${i * s + s / 2} 0 L${(i + 1) * s} ${h} Z ` : `M${i * s} 0 L${i * s + s / 2} ${h} L${(i + 1) * s} 0 Z `;
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="display:block;width:100%;height:${h}px"><path d="${d}" fill="${color}"/></svg>`;
+};
+
+let pageNo = 0;
+function slide(html, { dark = false, title = "", kicker = "", plain = false, titleStyle = "", panel = "" } = {}) {
+  pageNo++;
+  const no = String(pageNo).padStart(2, "0");
+  return `<section class="slide${dark ? " dark" : ""}">
+    ${plain ? "" : '<div class="frame"></div>'}
+    ${title ? `<div class="title"${titleStyle ? ` style="${titleStyle}"` : ""}>${kicker ? `<span class="kicker">${kicker}</span>` : ""}<h2>${title}</h2>${teeth(dark ? C[400] : C[600])}</div>` : ""}
+    ${html}
+    ${plain ? "" : `<div class="foot${panel ? ` panel-${panel}` : ""}"><span class="brand">${mark(dark || panel === "right" ? "#fff" : C[600])}<span>${B.footerLabel}</span></span><span class="no">${no}</span></div>`}
+  </section>`;
+}
+
+const S = [], SKIPPED = [];
+const SKIP = new Set(B.skip || []);
+const add = (id, ok, build) => {
+  if (SKIP.has(id)) return SKIPPED.push(`${id}: listed in "skip"`);
+  if (ok !== true) return SKIPPED.push(`${id}: ${ok}`);
+  [].concat(build()).forEach((s) => S.push(s));
+};
+const LOGO = B.logos;
+const H = LOGO.horizontal.onLight;
+
+/* 01 — cover */
+add("cover", true, () => slide(`
+  <div class="ghost" style="width:760px;left:-160px;top:-120px;opacity:.08">${mark("#fff")}</div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px">
+    <span style="font-size:30px;font-weight:500;color:var(--c-300)">${fmt(B.cover.kicker)}</span>
+    <img src="${LOGO.stacked.onDark}" style="width:560px">
+    <span class="num" style="font-size:22px;color:var(--c-200);letter-spacing:8px">${fmt(B.cover.tag)}</span>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0">${teethRow(1440, 22, C[500], true)}<div style="height:16px;background:${C[500]}"></div></div>
+`, { dark: true, plain: true }));
+
+/* 02 — introduction */
+add("intro", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1.25fr 1fr;gap:70px;align-items:center">
+    <div>
+      ${B.intro.paragraphs.map((p, i) => `<p class="lead rich"${i ? ' style="margin-top:22px"' : ""}>${fmt(p)}</p>`).join("\n      ")}
+    </div>
+    <div class="card" style="height:430px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,${C[900]},${C[600]});border:0">
+      <div style="width:250px">${mark("#fff")}</div>
+    </div>
+  </div>
+`, { title: fmt(B.intro.title) }));
+
+/* 03 — brand traits */
+add("traits", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:repeat(${B.traits.items.length},1fr);gap:34px;align-items:center;top:220px">
+    ${B.traits.items.map(({ name, text }) => `<div style="text-align:center">
+      <div style="width:230px;height:230px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        background:radial-gradient(circle at 30% 25%, ${C[500]}, ${C[900]});
+        color:#fff;font-size:34px;font-weight:700;line-height:1.35;padding:20px">${name}</div>
+      <p style="font-size:21px;color:var(--ink-2);margin:26px 10px 0;line-height:1.7">${fmt(text)}</p></div>`).join("")}
+  </div>
+`, { title: fmt(B.traits.title) }));
+
+/* 04 — logo versions */
+add("logos", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1.35fr 1fr;grid-template-rows:1fr 1fr;gap:28px;top:180px">
+    <div style="grid-row:1 / 3;display:flex;flex-direction:column">
+      <div class="card" style="flex:1;display:flex;align-items:center;justify-content:center"><img src="${LOGO.stacked.onLight}" style="width:72%"></div>
+      <div class="cap">${B.logoSlide.stacked}</div>
+    </div>
+    <div style="display:flex;flex-direction:column">
+      <div class="card" style="flex:1;display:flex;align-items:center;justify-content:center"><img src="${H}" style="width:82%"></div>
+      <div class="cap" style="margin-top:12px">${B.logoSlide.horizontal}</div>
+    </div>
+    <div style="display:flex;flex-direction:column">
+      <div class="card" style="flex:1;display:flex;align-items:center;justify-content:center"><div style="width:120px">${mark(C[600])}</div></div>
+      <div class="cap" style="margin-top:12px">${B.logoSlide.mark}</div>
+    </div>
+  </div>
+`, { title: fmt(B.logoSlide.title) }));
+
+/* 05 — construction grid; unit X = the mark's stroke thickness (computed from the mark by build.py) */
+const G = B.construction;
+add("construction", G && G.cols ? true : "no grid fits the mark (see build output)", () => {
+  const U = G.unit, [ox, oy] = G.origin, w = G.cols * U, h = G.rows * U;
+  const k = Math.max(w, h) / 646.54, pad = 31.746 * k, r = (v) => Math.round(v * 1000) / 1000;
+  let grid = "";
+  for (let i = 0; i <= G.cols; i++) grid += `<line x1="${r(ox + i * U)}" y1="${r(oy)}" x2="${r(ox + i * U)}" y2="${r(oy + h)}"/>`;
+  for (let j = 0; j <= G.rows; j++) grid += `<line x1="${r(ox)}" y1="${r(oy + j * U)}" x2="${r(ox + w)}" y2="${r(oy + j * U)}"/>`;
+  const [hc, hr] = G.highlight;
+  return slide(`
+    <div class="body" style="display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;top:170px">
+      <div class="card" style="height:500px;display:flex;align-items:center;justify-content:center;background:${C[900]};border:0">
+        <svg viewBox="${r(ox - pad)} ${r(oy - pad)} ${r(w + 2 * pad)} ${r(h + 2 * pad)}" style="width:440px">
+          <g stroke="${C[400]}" stroke-width="${r(1.6 * k)}" opacity=".45">${grid}</g>
+          ${markPaths('fill="#fff" fill-opacity=".92"')}
+          <rect x="${r(ox + hc * U)}" y="${r(oy + hr * U)}" width="${r(U)}" height="${r(U)}" fill="none" stroke="${HL}" stroke-width="${r(5 * k)}"/>
+          <text x="${r(ox + (hc + .5) * U)}" y="${r(oy - 11.746 * k)}" fill="${HL}" font-size="${r(30 * k)}" text-anchor="middle" font-family="${B.font.family}" font-weight="700">${B.construction.label}</text>
+        </svg>
+      </div>
+      <div>
+        ${G.paragraphs.map((p, i) => `<p class="lead rich"${i ? ' style="margin-top:20px"' : ""}>${fmt(p)}</p>`).join("\n        ")}
+      </div>
+    </div>
+  `, { title: fmt(G.title) });
+});
+
+/* 06 — colour palette */
+const P = B.palette;
+const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)).join(", ");
+const lum = (h) => { if (h === "#fff") return 1; const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255); return .2126 * r + .7152 * g + .0722 * b; };
+add("palette", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1fr 1.3fr;gap:40px;top:178px">
+    <div class="card" style="overflow:hidden;display:flex;flex-direction:column;border:0">
+      <div style="flex:1;background:${C[600]};color:#fff;padding:34px 38px;display:flex;flex-direction:column;justify-content:flex-end">
+        <div style="font-size:24px;font-weight:500;opacity:.85">${P.primaryName}</div>
+        <div class="num" style="font-size:58px;font-weight:700;text-align:right">${C[600]}</div>
+        <div class="num" style="font-size:18px;opacity:.85;text-align:right">RGB ${rgb(C[600])} · ${P.primaryCode}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;height:120px">
+        <div style="background:${INK};color:#fff;padding:20px 26px"><div style="font-size:18px">${P.inkLabel}</div><div class="num" style="font-size:24px;font-weight:700;text-align:right">${INK}</div></div>
+        <div style="background:#fff;color:var(--ink);padding:20px 26px;border-top:1.5px solid var(--line)"><div style="font-size:18px">${P.whiteLabel}</div><div class="num" style="font-size:24px;font-weight:700;text-align:right">#FFFFFF</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:22px;font-weight:700;color:var(--c-800);margin-bottom:12px">${P.scaleLabel}</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+        ${["900", "800", "700", "600", "500", "400", "300", "200", "100", "50"].map((n) => `<div style="border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#fff">
+          <div style="height:92px;background:${C[n]}"></div>
+          <div style="padding:8px 10px" class="num"><b style="font-size:16px">${C[n]}</b><div style="font-size:13px;color:var(--muted)">${P.scalePrefix}${n}</div></div></div>`).join("")}
+      </div>
+      <div style="font-size:22px;font-weight:700;color:var(--c-800);margin:24px 0 10px">${P.usageLabel}</div>
+      <div style="display:flex;height:54px;border-radius:12px;overflow:hidden;border:1px solid var(--line);font-size:18px;font-weight:600">
+        ${P.usage.map(({ label, pct, color }) => `<div style="flex:${pct};background:${K(color)};${lum(K(color)) > .5 ? "" : "color:#fff;"}display:flex;align-items:center;justify-content:center">${label ? `${label} <span class="num">&nbsp;${pct}%</span>` : `<span class="num">${pct}%</span>`}</div>`).join("\n        ")}
+      </div>
+    </div>
+  </div>
+`, { title: fmt(P.title) }));
+
+/* 07 — Arabic typeface */
+const T = B.typeface;
+add("font-arabic", true, () => slide(`
+  <div style="position:absolute;top:0;bottom:0;right:0;width:46%;padding:70px 80px 0 40px">
+    <div style="text-align:center"><span style="font-size:24px;color:var(--c-500)">${T.arabicLabel}</span>${teeth()}</div>
+    <div style="font-size:96px;font-weight:700;color:var(--c-700);text-align:center;margin-top:10px;line-height:1.3">${B.font.nameAr}</div>
+    <div class="num" style="text-align:center;font-size:20px;color:var(--muted);letter-spacing:3px">${B.font.family.toUpperCase()} — ${B.font.source.toUpperCase()} · ${B.font.license}</div>
+    <div style="margin-top:28px;font-size:22px;color:var(--ink-2)">${T.lettersLabel}</div>
+    <div style="font-size:30px;line-height:1.8;color:var(--c-800);margin-top:4px">${T.letters}</div>
+    <div class="rich" style="margin-top:18px;font-size:19px;color:var(--muted);line-height:1.8;background:#fff;border-radius:14px;padding:14px 18px;border:1.5px solid var(--c-100)">
+      ${fmt(T.note)}</div>
+  </div>
+  <div style="position:absolute;top:0;bottom:0;left:0;width:54%;background:linear-gradient(160deg,${C[800]},${C[600]});overflow:hidden">
+    <div style="position:absolute;font-size:560px;font-weight:700;color:#fff;line-height:1;right:60px;top:40px">${T.glyph}</div>
+    <div style="position:absolute;bottom:0;left:0;right:0">${teethRow(780, 20, C[50], true)}</div>
+  </div>
+`, { panel: "left" }));
+
+/* 08 — type family */
+add("font-family", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1.2fr 1fr;gap:60px;top:170px">
+    <div class="card" style="background:${C[900]};border:0;padding:30px 40px;display:grid;grid-template-columns:1fr 1fr;gap:6px 40px;align-content:center">
+      ${W.map(([w, n]) => `<div style="display:flex;justify-content:space-between;align-items:baseline;color:#fff;border-bottom:1px solid rgba(255,255,255,.12);padding:6px 0">
+        <span style="font-weight:${w};font-size:42px">${T.familySample}</span><span class="num" style="font-size:15px;color:var(--c-300)">${n}</span></div>`).join("")}
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      <div style="font-size:40px;font-weight:700;color:var(--c-700)">${T.familyTitle}</div>
+      <p class="lead rich" style="margin-top:14px">${fmt(T.familyLead)}</p>
+      <p class="lead rich" style="margin-top:14px">${fmt(T.familyRoles)}</p>
+    </div>
+  </div>
+`, { title: T.familyTitle }));
+
+/* 09 — Latin typeface */
+add("font-latin", true, () => slide(`
+  <div style="position:absolute;top:0;bottom:0;right:0;width:54%;background:linear-gradient(200deg,${C[800]},${C[600]});overflow:hidden">
+    <div class="latin" style="position:absolute;font-size:520px;font-weight:700;color:#fff;line-height:1;left:40px;top:60px">${T.latinGlyph}</div>
+    <div style="position:absolute;bottom:0;left:0;right:0">${teethRow(780, 20, C[50], true)}</div>
+  </div>
+  <div style="position:absolute;top:0;bottom:0;left:0;width:46%;padding:70px 40px 0 80px">
+    <div style="text-align:center"><span style="font-size:24px;color:var(--c-500)">${T.latinLabel}</span>${teeth()}</div>
+    <div class="latin" style="font-size:80px;font-weight:700;color:var(--c-700);text-align:center;margin-top:16px">${T.latinName || B.font.family.toUpperCase()}</div>
+    <p class="rich" style="font-size:21px;color:var(--ink-2);line-height:1.8;margin-top:18px">${fmt(T.latinText)}</p>
+    <div class="latin" style="font-size:26px;color:var(--c-800);line-height:1.6;margin-top:12px;text-align:left">
+      <b>${T.latinSample[0]}</b><br>${T.latinSample.slice(1).join("<br>")}<br>
+      <span style="font-size:21px;color:var(--muted)">${T.alphabet}</span></div>
+  </div>
+`, { panel: "right" }));
+
+/* 10 — type scale */
+const TS = B.typeScale;
+add("type-scale", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1.3fr 1fr;gap:60px;top:170px">
+    <div class="card" style="padding:34px 44px;display:flex;flex-direction:column;justify-content:center;gap:14px">
+      ${[...TS.steps, [16, 400, TS.bodySample]].map(([px, w, t]) => `<div style="display:flex;align-items:baseline;gap:22px;border-bottom:1px dashed var(--c-200);padding-bottom:10px">
+        <span class="num" style="flex:none;width:70px;font-size:16px;color:var(--c-500);font-weight:700">${px}px</span>
+        <span style="font-size:${px}px;font-weight:${w};color:${px > 30 ? "var(--c-700)" : "var(--ink)"};line-height:1.35">${t}</span></div>`).join("")}
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      <div style="font-size:40px;font-weight:700;color:var(--c-700)">${TS.ratioTitle}</div>
+      <p class="lead rich" style="margin-top:14px">${fmt(TS.ratioText)}</p>
+      <div class="num" style="font-size:26px;color:var(--c-800);margin-top:20px;line-height:1.8;text-align:right">${TS.ratioFormula}</div>
+    </div>
+  </div>
+`, { title: fmt(TS.title) }));
+
+/* 11–12 — wrong uses of the mark and of the logo */
+const M = B.misuse;
+const wrongGrid = (items) => `<div class="body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:30px;top:200px">
+  ${items.map(([t, art], i) => `<div><div class="card bad" style="height:290px;display:flex;align-items:center;justify-content:center;overflow:hidden">${art}</div>
+    <div class="cap"><span class="num" style="color:var(--muted);font-size:17px">(0${i + 1})</span><br>${t}</div></div>`).join("")}</div>`;
+add("misuse-mark", true, () => {
+  const arts = [
+    `<div style="width:150px;height:150px;overflow:hidden"><div style="width:230px;margin:-40px 0 0 -40px">${mark(C[600])}</div></div>`,
+    `<div style="width:150px;transform:rotate(28deg)">${mark(C[600])}</div>`,
+    `<svg viewBox="${VB}" style="width:150px"><defs><linearGradient id="rb"><stop offset="0" stop-color="#e11d48"/><stop offset=".5" stop-color="#f59e0b"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>${markPaths('fill="url(#rb)"')}</svg>`,
+    `<div style="width:150px;filter:drop-shadow(12px 12px 0 ${INK}) drop-shadow(0 0 10px #f59e0b)">${mark(C[600])}</div>`,
+  ];
+  return slide(wrongGrid(M.markItems.map((t, i) => [t, arts[i]])), { title: fmt(M.markTitle) });
+});
+add("misuse-logo", true, () => {
+  const arts = [
+    `<img src="${H}" style="width:250px;height:110px;object-fit:fill">`,
+    `<img src="${H}" style="width:230px;transform:rotate(-22deg)">`,
+    `<img src="${H}" style="width:230px;filter:hue-rotate(160deg) saturate(2)">`,
+    `<img src="${H}" style="width:230px;filter:drop-shadow(6px 6px 0 ${INK}) blur(.6px)">`,
+  ];
+  return slide(wrongGrid(M.logoItems.map((t, i) => [t, arts[i]])), { title: fmt(M.logoTitle) });
+});
+
+/* 13 — clear space */
+const CS = B.clearSpace;
+const tag2x = (pos) => `<span class="num" style="position:absolute;${pos};color:${C[600]};font-weight:700">2X</span>`;
+add("clear-space", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1fr 1.15fr;gap:60px;top:170px">
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      ${CS.paragraphs.map((p, i) => `<p class="lead rich"${i ? ' style="margin-top:18px"' : ""}>${fmt(p)}</p>`).join("\n      ")}
+    </div>
+    <div class="card" style="display:flex;align-items:center;justify-content:center">
+      <div style="position:relative;padding:44px;border:2px dashed ${C[400]};border-radius:6px;background:repeating-linear-gradient(45deg,${C[50]} 0 10px,#fff 10px 20px)">
+        <div style="background:#fff;padding:2px"><img src="${H}" style="width:420px;display:block"></div>
+        ${tag2x("top:8px;left:50%;transform:translateX(-50%)")}
+        ${tag2x("bottom:8px;left:50%;transform:translateX(-50%)")}
+        ${tag2x("right:8px;top:50%;transform:translateY(-50%)")}
+        ${tag2x("left:8px;top:50%;transform:translateY(-50%)")}
+      </div>
+    </div>
+  </div>
+`, { title: fmt(CS.title) }));
+
+/* 14 — logo placement */
+const thumb = (inner) => `<div style="position:relative;width:250px;height:160px;background:#fff;border:1.5px solid var(--c-200);border-radius:10px">${inner}</div>`;
+add("placement", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1.2fr 1fr;gap:60px;top:180px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-content:center;justify-items:center">
+      ${thumb(["top:14px;right:14px", "top:14px;left:14px", "bottom:14px;right:14px", "bottom:14px;left:14px"].map((p) => mark(C[600], `style="${p};position:absolute;width:30px"`)).join(""))}
+      ${thumb(`<img src="${H}" style="position:absolute;top:14px;right:14px;width:110px">`)}
+      ${thumb(`<img src="${H}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px">`)}
+      ${thumb(`<img src="${LOGO.stacked.onLight}" style="position:absolute;bottom:14px;left:14px;width:90px">`)}
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      ${B.placement.paragraphs.map((p, i) => `<p class="lead rich"${i ? ' style="margin-top:14px"' : ""}>${fmt(p)}</p>`).join("\n      ")}
+    </div>
+  </div>
+`, { title: fmt(B.placement.title) }));
+
+/* 15–16 — patterns built from the mark. patterns.gap insets the mark in its tile (a share of the
+   tile per side), so marks stay apart and outlines are never clipped at the tile's edge;
+   0 lets marks touch, which only suits a mark with open space around its silhouette. */
+const SW = VBW / 658;   // stroke widths below were drawn for a 658-unit mark
+const GAP = Math.min(Math.max(Number((B.patterns || {}).gap) || 0, 0), .3);
+const tile = (id, size, rot, fill, op, stroke) => {
+  const inset = size * GAP, inner = size - 2 * inset, at = GAP ? ` x="${inset}" y="${inset}"` : "";
+  return `<pattern id="${id}" width="${size}" height="${size}" patternUnits="userSpaceOnUse" patternTransform="rotate(${rot})">
+  <svg viewBox="${VB}"${at} width="${inner}" height="${inner}">${markPaths(`fill="${stroke ? "none" : fill}" stroke="${stroke ? fill : "none"}" stroke-width="${stroke ? stroke * SW : 0}" opacity="${op}"`)}</svg></pattern>`;
+};
+const swatch = (id, defs, bg) => `<div class="card" style="overflow:hidden;height:330px"><svg width="100%" height="100%"><defs>${defs}</defs><rect width="100%" height="100%" fill="${bg}"/><rect width="100%" height="100%" fill="url(#${id})"/></svg></div>`;
+const tri = (id, s, c) => `<pattern id="${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse"><path d="M0 ${s} L${s / 2} 0 L${s} ${s} Z" fill="${c}"/></pattern>`;
+const crenel = (id, s, c) => `<pattern id="${id}" width="${s}" height="${s * 1.6}" patternUnits="userSpaceOnUse"><path d="M0 ${s * .7} L${s / 2} 0 L${s} ${s * .7} Z" fill="${c}"/></pattern>`;
+const patterns = [
+  swatch("p1", tile("p1", 70, 0, C[400], .55, 14), C[900]),
+  swatch("p2", tile("p2", 110, 45, C[500], .9), C[800]),
+  swatch("p3", tile("p3", 36, 0, "#fff", .14), C[600]),
+  NAJDI ? swatch("p4", crenel("p4", 28, C[500]), C[900]) : swatch("p4", tile("p4", 54, 30, C[500], .55), C[900]),
+  NAJDI ? swatch("p5", tri("p5", 22, "rgba(255,255,255,.08)"), C[700]) : swatch("p5", tile("p5", 120, 0, "#fff", .1, 8), C[700]),
+  swatch("p6", tile("p6", 180, 0, C[300], .9, 6), "#fff"),
+];
+const patSlide = (list, off) => slide(`<div class="body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:34px;top:200px">
+  ${list.map((p, i) => `<div>${p}<div class="cap num">(0${off + i + 1})</div></div>`).join("")}</div>`, { title: fmt(B.patterns.title) });
+add("patterns", true, () => [patSlide(patterns.slice(0, 3), 0), patSlide(patterns.slice(3), 3)]);
+
+/* 17 — Najdi patterns (the same triangles as the document letterhead) */
+const N = B.najdi;
+add("najdi", !NAJDI ? 'motif is "none"' : N && N.files ? true : "no Najdi pattern files", () => slide(`
+  <div class="body" style="top:178px;bottom:84px;display:grid;grid-template-rows:auto 1fr;gap:22px">
+    <div class="card" style="overflow:hidden;border:0;height:150px;position:relative">
+      <img src="${N.files["header-band.svg"]}" style="width:100%;height:100%;object-fit:cover;object-position:top">
+      <img src="${LOGO.horizontal.onDark}" style="position:absolute;top:32px;right:40px;height:62px">
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+      ${N.items.map(({ label, file, bg, fit }) => `<div style="display:flex;flex-direction:column">
+        <div class="card" style="flex:1;overflow:hidden;background:${K(bg)} url('${N.files[file]}') ${fit === "cover" ? "center / cover no-repeat" : "0 0 / auto 30px repeat"}"></div>
+        <div style="font-size:19px;font-weight:600;color:var(--c-800);text-align:center;margin-top:10px">${label}</div>
+        <div class="num" style="font-size:13px;color:var(--muted);text-align:center">${file}</div></div>`).join("")}
+    </div>
+  </div>
+  <div class="num" style="position:absolute;bottom:58px;left:0;right:0;text-align:center;font-size:14px;color:var(--muted)">${N.label}</div>
+`, { title: fmt(N.title) }));
+
+/* 18 — graphic elements */
+const ELEMENT_ART = {
+  teeth: () => `<div style="width:220px">${teethRow(220, 22, C[600])}${teethRow(220, 22, C[800], true)}</div>`,
+  chamfer: () => `<svg viewBox="0 0 200 120" style="width:220px"><path d="M30 0 H200 V90 L170 120 H0 V30 Z" fill="${C[600]}"/></svg>`,
+  gradient: () => `<div style="width:220px;height:120px;border-radius:14px;background:linear-gradient(135deg,${C[900]},${C[700]} 55%,${C[600]})"></div>`,
+  triangles: () => `<svg viewBox="0 0 280 120" style="width:220px;border-radius:14px"><defs>${tri("tx", 20, "rgba(255,255,255,.12)")}</defs><rect width="280" height="120" fill="${C[700]}"/><rect width="280" height="120" fill="url(#tx)"/></svg>`,
+  pattern: () => `<svg viewBox="0 0 280 120" style="width:220px;border-radius:14px"><defs>${tile("px", 40, 0, "#fff", .14)}</defs><rect width="280" height="120" fill="${C[700]}"/><rect width="280" height="120" fill="url(#px)"/></svg>`,
+};
+add("elements", true, () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:repeat(${B.elements.items.length},1fr);gap:26px;top:200px">
+    ${B.elements.items.map(({ kind, title, text }) => `<div class="card" style="min-width:0;padding:26px 22px;display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div style="height:170px;display:flex;align-items:center;justify-content:center">${ELEMENT_ART[kind]()}</div>
+      <div style="font-size:26px;font-weight:700;color:var(--c-700);margin-top:10px">${title}</div>
+      <p class="rich" style="font-size:18px;color:var(--ink-2);line-height:1.75;margin:10px 0 0">${fmt(text)}</p></div>`).join("")}
+  </div>
+`, { title: fmt(B.elements.title) }));
+
+/* 19 — icon style */
+add("icons", true, () => slide(`
+  <div class="body" style="top:200px;display:flex;flex-direction:column;align-items:center">
+    <div style="display:grid;grid-template-columns:repeat(5,110px);gap:30px 54px">
+      ${B.iconStyle.names.map((n) => `<div style="width:110px;height:110px;border-radius:24px;background:#fff;border:1.5px solid var(--c-100);display:flex;align-items:center;justify-content:center;color:${C[600]}">
+        ${icon(n, "width:50px;height:50px")}</div>`).join("")}
+    </div>
+    <p class="num" style="font-size:19px;color:var(--muted);margin-top:28px">${B.iconStyle.caption}</p>
+  </div>
+`, { title: fmt(B.iconStyle.title) }));
+
+/* 20 — official letterhead (only when a letterhead image is given) */
+const LH = B.letterhead;
+add("letterhead", LH && LH.image ? true : "no letterhead image", () => slide(`
+  <div class="body" style="display:grid;grid-template-columns:1fr 1fr;gap:60px;top:150px;bottom:70px">
+    <div style="display:flex;justify-content:center;align-items:flex-start">
+      <img src="${LH.image}" style="height:560px;border-radius:6px;border:1.5px solid ${C[200]};transform:rotate(-2.5deg)">
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      <div style="font-size:40px;font-weight:700;color:var(--c-700)">${LH.heading}</div>
+      ${LH.paragraphs.map((p) => `<p class="lead rich" style="margin-top:14px">${fmt(p)}</p>`).join("\n      ")}
+    </div>
+  </div>
+`, { title: fmt(LH.title), titleStyle: "top:46px" }));
+
+/* 21 — business card */
+const CD = B.card;
+const bizCard = (inner, bg) => `<div style="width:520px;height:300px;border-radius:18px;position:relative;overflow:hidden;background:${bg}">${inner}</div>`;
+add("card", true, () => slide(`
+  <div class="body" style="display:flex;gap:60px;align-items:center;justify-content:center;top:180px">
+    ${bizCard(`<div class="ghost" style="width:420px;left:-120px;top:-80px;opacity:.1">${mark("#fff")}</div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><img src="${LOGO.stacked.onDark}" style="width:300px"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0">${teethRow(520, 14, C[500], true)}<div style="height:8px;background:${C[500]}"></div></div>`, `linear-gradient(135deg,${C[900]},${C[600]})`)}
+    ${bizCard(`<div style="position:absolute;top:0;left:0;right:0">${teethRow(520, 12, C[600])}</div>
+      <div style="position:absolute;top:44px;right:40px;left:40px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div><div style="font-size:30px;font-weight:700;color:var(--ink)">${CD.name}</div><div style="font-size:${CD.roleSize || 19}px;color:var(--c-600);margin-top:4px;text-wrap:balance">${CD.role}</div></div>
+        <div style="width:58px;flex:none">${mark(C[600])}</div></div>
+      <div class="num" style="position:absolute;bottom:${CD.rows.length > 3 ? 26 : 34}px;left:40px;right:40px;display:grid;gap:${CD.rows.length > 3 ? 4 : 8}px;font-size:17px;color:var(--ink-2);text-align:right">
+        ${CD.rows.map(({ icon: i, text }) => `<span style="display:flex;gap:10px;align-items:center;justify-content:flex-end">${text} ${icon(i, `width:18px;color:${C[600]}`)}</span>`).join("\n        ")}</div>`, "#fff")}
+  </div>
+  <div class="cap" style="position:absolute;bottom:110px;left:0;right:0">${CD.caption}</div>
+`, { title: fmt(CD.title) }));
+
+/* 22 — app and browser icon */
+const AI = B.appIcon;
+add("app-icon", true, () => slide(`
+  <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,#fff,${C[100]})"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:90px">
+    <div style="width:330px;height:330px;border-radius:78px;background:linear-gradient(145deg,${C[500]},${C[900]});display:flex;align-items:center;justify-content:center;
+      box-shadow:0 30px 0 -6px ${C[800]};transform:perspective(900px) rotateX(18deg) rotateZ(-8deg)">
+      <div style="width:200px">${mark("#fff")}</div></div>
+    <div style="display:flex;gap:30px;align-items:flex-end">
+      ${AI.sizes.map((s) => `<div style="text-align:center"><div style="width:${Math.max(s, 16)}px;height:${Math.max(s, 16)}px;border-radius:${s / 4.4}px;background:${C[600]};display:flex;align-items:center;justify-content:center;margin:0 auto">
+        <div style="width:${s * .62}px">${mark("#fff")}</div></div><div class="num" style="font-size:15px;color:var(--muted);margin-top:10px">${s}px</div></div>`).join("")}
+    </div>
+  </div>
+  <div class="title" style="top:56px"><span class="kicker">${AI.kicker}</span><h2>${fmt(AI.title)}</h2>${teeth()}</div>
+`, {}));
+
+/* 23… — banners, one slide each; "type" picks the layout. A banner is 1000x470; its crenellated
+   band takes the bottom BAND px. The copy of hero, tiles and phone banners sits on a fixed line
+   CTA_GAP px above the band (or at "top" when brand.json sets one), so every call-to-action keeps
+   the same distance from the teeth however long the copy is. data-* attributes mark the parts
+   build.py measures (copy against band, logo and art). */
+const BN = B.banners;
+const DARK_BG = `linear-gradient(135deg,${C[900]},${C[700]} 55%,${C[600]})`;
+const BAND = NAJDI ? 26 : 10, CTA_GAP = 30;
+const copyAt = (b) => b.top != null ? `top:${b.top}px` : `bottom:${BAND + CTA_GAP}px`;
+const banner = (n, b, inner, light = false) => slide(`
+  <div class="num" style="position:absolute;top:370px;left:48px;font-size:110px;font-weight:700;color:var(--c-200);line-height:1">${String(n).padStart(2, "0")}</div>
+  <div data-banner="${n}" data-type="${b.type}" style="position:absolute;top:210px;left:50%;transform:translateX(-50%);width:1000px;height:470px;border-radius:24px;overflow:hidden;background:${light ? `linear-gradient(180deg,#fff,${C[100]})` : DARK_BG}">
+    <img data-logo src="${light ? LOGO.horizontal.onLight : LOGO.horizontal.onDark}" style="position:absolute;top:30px;right:36px;height:52px">
+    ${inner}
+    <div data-band style="position:absolute;bottom:0;left:0;right:0">${teethRow(1000, 16, C[500], true)}<div style="height:10px;background:${C[500]}"></div></div>
+  </div>
+`, { title: fmt(BN.title) });
+/* Call-to-action colours: white on the dark gradient, or colors.accent with ink text when the brand sets one. */
+const ACCENT = B.colors.accent;
+const BTN_BG = ACCENT || "#fff", BTN_FG = ACCENT ? INK : C[800];
+const CHAMFER = (c) => `clip-path:polygon(${c}px 0,100% 0,100% calc(100% - ${c}px),calc(100% - ${c}px) 100%,0 100%,0 ${c}px)`;
+/* A phone: ink body, rounded screen. Used by the phone banner and the storefront mock-up. */
+const phoneShell = (outer, screen, inner, { attrs = "", r = 38, pad = 12 } = {}) =>
+  `<div${attrs} style="${outer};border-radius:${r}px;background:${INK};padding:${pad}px"><div style="width:100%;height:100%;border-radius:${r - pad + 2}px;${screen}">${inner}</div></div>`;
+const cta = (t) => `<span style="display:inline-block;margin-top:26px;background:${BTN_BG};color:${BTN_FG};font-weight:700;font-size:22px;padding:10px 30px;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)">${t}</span>`;
+const BANNER = {
+  hero: (b) => `
+  <div class="ghost" style="width:520px;left:-60px;top:-40px;opacity:.1">${mark("#fff")}</div>
+  <div data-copy style="position:absolute;${copyAt(b)};right:60px;width:${b.width || 560}px;color:#fff">
+    <div style="font-size:${b.size || 64}px;font-weight:700;line-height:1.25">${lines(b.headline)}</div>
+    <div style="font-size:26px;color:var(--c-200);margin-top:14px">${b.text}</div>
+    ${b.cta ? cta(b.cta) : ""}</div>`,
+  tiles: (b) => `
+  <div data-art style="position:absolute;top:110px;left:60px;display:grid;grid-template-columns:repeat(2,${b.tileWidth || 170}px);gap:18px">
+    ${b.tiles.map(({ icon: i, label }) => `<div style="height:140px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;font-size:${b.tileSize || 22}px;font-weight:500;text-align:center;padding:0 10px">${icon(i, "width:40px;height:40px")}${label}</div>`).join("")}
+  </div>
+  <div data-copy style="position:absolute;${copyAt(b)};right:60px;width:${b.width || 480}px;color:#fff">
+    <div style="font-size:${b.size || 58}px;font-weight:700;line-height:1.25">${lines(b.headline)}</div>
+    <div style="font-size:24px;color:var(--c-200);margin-top:14px">${b.text}</div>
+    ${b.cta ? cta(b.cta) : ""}</div>`,
+  phone: (b) => `
+  ${phoneShell("position:absolute;left:90px;top:80px;width:250px;height:420px;transform:rotate(-8deg)",
+    `background:${C[50]};padding:22px 16px;display:flex;flex-direction:column;gap:12px`, `
+      <div style="width:44px;margin:0 auto">${mark(C[600])}</div>
+      ${[90, 70, 80].map((w) => `<div style="height:46px;border-radius:10px;background:#fff;border:1.5px solid ${C[100]};display:flex;align-items:center;gap:8px;padding:0 10px"><div style="width:22px;height:22px;border-radius:6px;background:${C[600]}"></div><div style="height:8px;width:${w}px;border-radius:4px;background:${C[200]}"></div></div>`).join("")}
+      <div style="height:70px;border-radius:12px;background:linear-gradient(135deg,${C[700]},${C[600]})"></div>
+    `, { attrs: " data-art" })}
+  <div data-copy style="position:absolute;${copyAt(b)};right:60px;width:${b.width || 520}px;color:#fff">
+    ${b.kicker ? `<div style="font-size:24px;color:var(--c-300)">${b.kicker}</div>` : ""}
+    <div style="font-size:${b.size || 66}px;font-weight:700;line-height:1.25">${lines(b.headline)}</div>
+    <div style="font-size:25px;color:var(--c-200);margin-top:12px">${b.text}</div>
+    ${b.cta ? cta(b.cta) : ""}</div>`,
+  /* The diamonds stand on the band (row bottom 46 px above the banner's edge); the copy above them. */
+  values: (b) => {
+    const s = b.valueSize || 150, k = s / 150;
+    return `
+  <div data-copy style="position:absolute;top:${b.top || 120}px;left:0;right:0;text-align:center;color:${C[800]}">
+    <div style="font-size:${b.size || 60}px;font-weight:700;line-height:1.3">${lines(b.headline)}</div>
+    <div style="font-size:25px;color:var(--ink-2);margin-top:10px">${b.text}</div></div>
+  <div data-art style="position:absolute;bottom:46px;left:0;right:0;display:flex;justify-content:center;gap:${Math.round(28 * k)}px">
+    ${b.values.map((t) => `<div style="width:${s}px;height:${s}px;background:#fff;border:2px solid ${C[200]};transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:${Math.round(14 * k)}px"><span style="transform:rotate(-45deg);font-size:${Math.round(24 * k)}px;font-weight:700;color:${C[600]}">${t}</span></div>`).join("")}
+  </div>`;
+  },
+  contact: (b) => {
+    const compact = b.rows.length > 3;
+    const [fs, box, ic, gap] = compact ? [24, 46, 22, 12] : [30, 58, 28, 18];
+    return `
+  <div class="ghost" style="width:430px;right:-80px;bottom:-90px;opacity:.1">${mark("#fff")}</div>
+  <div data-copy style="position:absolute;top:${b.top || (compact ? 105 : 130)}px;right:60px;left:60px;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+    <div><div style="font-size:${b.size || 62}px;font-weight:700;line-height:1.25">${lines(b.headline)}</div>
+      <div style="font-size:25px;color:var(--c-200);margin-top:12px">${b.text}</div></div>
+    <div class="num" style="display:grid;gap:${gap}px;font-size:${fs}px;font-weight:600">
+      ${b.rows.map(({ icon: i, text }) => `<div style="display:flex;align-items:center;gap:16px;justify-content:flex-end">${text}<span style="flex:none;width:${box}px;height:${box}px;border-radius:14px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center">${icon(i, `width:${ic}px;height:${ic}px`)}</span></div>`).join("")}
+    </div></div>`;
+  },
+};
+/* 23… — mock-ups (only when brand.json has "mockups"): social posts, and the storefront on a phone and a
+   desktop browser. Every colour comes from the scale, the mark and the logos, so they re-colour per brand.
+   data-fit marks boxes build.py checks for overflowing copy. */
+const MK = B.mockups || {};
+const band = (w, h, color) => NAJDI ? `${teethRow(w, h, color, true)}<div style="height:${Math.round(h * .6)}px;background:${color}"></div>` : `<div style="height:6px;background:${color}"></div>`;
+const POST = 372;
+const POST_LOOKS = [
+  /* dark gradient, faint giant mark */
+  { bg: DARK_BG, logo: LOGO.horizontal.onDark, head: "#fff", text: C[200], chip: "rgba(255,255,255,.14)", chipFg: "#fff",
+    art: () => `<div class="ghost" style="width:330px;left:-70px;bottom:-60px;opacity:.1">${mark("#fff")}</div>`, band: C[500] },
+  /* light, mark pattern fading under the copy */
+  { bg: C[50], logo: LOGO.horizontal.onLight, head: C[800], text: "var(--ink-2)", chip: C[600], chipFg: "#fff",
+    art: (i) => `<svg width="100%" height="100%" style="position:absolute;inset:0"><defs>${tile(`mk-p${i}`, 74, 0, C[300], .7, 6)}
+      <linearGradient id="mk-f${i}" x1="0" y1="0" x2="0" y2="1"><stop offset=".15" stop-color="${C[50]}" stop-opacity="0"/><stop offset=".62" stop-color="${C[50]}"/></linearGradient></defs>
+      <rect width="100%" height="100%" fill="url(#mk-p${i})"/><rect width="100%" height="100%" fill="url(#mk-f${i})"/></svg>`, band: C[600] },
+  /* primary, flat, one big faint mark */
+  { bg: C[600], logo: LOGO.horizontal.onDark, head: "#fff", text: C[100], chip: "#fff", chipFg: C[600],
+    art: () => `<div class="ghost" style="width:300px;right:36px;top:40px;opacity:.13">${mark("#fff")}</div>`, band: C[800] },
+];
+const post = (p, i) => {
+  const L = POST_LOOKS[i % 3];
+  return `<div class="card" style="width:${POST}px;overflow:hidden;border:1px solid var(--line);box-shadow:0 24px 48px -26px rgba(13,18,28,.35)">
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 14px">
+      <div style="flex:none;width:36px;height:36px;border-radius:50%;background:${C[600]};display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff,0 0 0 3.5px ${C[300]}"><div style="width:20px;display:flex">${mark("#fff")}</div></div>
+      <div style="flex:1;min-width:0;line-height:1.25"><div style="font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${B.name}</div>
+        <div class="num" style="font-size:12px;color:var(--muted);text-align:right">${B.nameLatin}</div></div>
+      ${icon("ellipsis", "flex:none;width:22px;height:22px;color:var(--ink-2)")}
+    </div>
+    <div style="position:relative;width:${POST}px;height:${POST}px;overflow:hidden;background:${L.bg}">
+      ${L.art(i)}
+      <img src="${L.logo}" style="position:absolute;top:24px;right:26px;height:30px">
+      <div data-fit="mockups.social[${i}]" style="position:absolute;top:70px;right:28px;left:28px;bottom:${NAJDI ? 38 : 30}px;display:flex;flex-direction:column;overflow:hidden">
+        <div style="margin-top:auto">
+          ${p.icon ? `<div style="width:54px;height:54px;border-radius:16px;background:${L.chip};color:${L.chipFg};display:flex;align-items:center;justify-content:center;margin-bottom:16px">${icon(p.icon, "width:28px;height:28px")}</div>` : ""}
+          <div style="font-size:${p.size || 36}px;font-weight:700;line-height:1.3;color:${L.head}">${lines(p.headline)}</div>
+          ${p.text ? `<div style="font-size:17px;line-height:1.6;color:${L.text};margin-top:8px">${p.text}</div>` : ""}
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0">${band(POST, 12, L.band)}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;padding:12px 16px 14px;color:var(--ink)">
+      ${["heart", "message-circle", "send"].map((n) => icon(n, "width:24px;height:24px")).join("")}
+      <span style="flex:1"></span>${icon("bookmark", "width:24px;height:24px")}
+    </div>
+  </div>`;
+};
+
+/* The storefront hero, drawn at a real screen width (phone 375 px, desktop 1280 px) and scaled into its frame. */
+const storeBtn = (t, fs, c) => `<span style="display:inline-block;background:${BTN_BG};color:${BTN_FG};font-weight:700;font-size:${fs}px;padding:${fs * .45}px ${fs * 1.35}px;${CHAMFER(c)}">${t}</span>`;
+const storeHero = (st, { h, pad, hs, ts, bs, ghost, wide }) => `<div style="position:relative;height:${h}px;border-radius:${wide ? 28 : 22}px;overflow:hidden;background:${DARK_BG};color:#fff">
+    <div class="ghost" style="width:${ghost}px;left:${-ghost * .18}px;top:${-ghost * .12}px;opacity:${wide ? .07 : .1}">${mark("#fff")}</div>
+    <div data-fit="mockups.store (${wide ? "desktop" : "phone"} hero)" style="position:absolute;top:${pad}px;bottom:${pad}px;right:${pad}px;${wide ? "width:640px" : `left:${pad}px`};display:flex;flex-direction:column;overflow:hidden">
+      <div style="margin:auto 0">
+        <div style="font-size:${hs}px;font-weight:700;line-height:1.3">${lines(st.headline)}</div>
+        ${st.text ? `<div style="font-size:${ts}px;line-height:1.65;color:var(--c-200);margin-top:${ts * .6}px">${st.text}</div>` : ""}
+        ${st.cta ? `<div style="margin-top:${bs * 1.2}px">${storeBtn(st.cta, bs, wide ? 12 : 9)}</div>` : ""}
+      </div>
+    </div>
+    ${wide ? `<div style="position:absolute;left:56px;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(2,150px);gap:16px">
+      ${st.items.map(({ icon: n, label }, i) => `<div style="${st.items.length === 3 && i === 2 ? "grid-column:1 / -1;justify-self:center;width:150px;" : ""}height:118px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.22);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:18px;font-weight:500;text-align:center;padding:0 10px">${icon(n, "width:34px;height:34px")}${label}</div>`).join("")}
+    </div>` : ""}
+    <div style="position:absolute;bottom:0;left:0;right:0">${band(wide ? 1200 : 343, wide ? 14 : 10, C[500])}</div>
+  </div>`;
+const serviceCard = ({ icon: n, label }, i, { span, chip, ic, fs, h }) => `<div data-fit="mockups.store.items[${i}]" style="${span ? "grid-column:1 / -1;flex-direction:row;gap:14px;" : "flex-direction:column;gap:10px;"}height:${h}px;background:#fff;border:1.5px solid ${C[100]};border-radius:18px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0 10px;box-shadow:0 8px 18px -14px rgba(13,18,28,.25)">
+    <div style="flex:none;width:${chip}px;height:${chip}px;border-radius:${chip * .3}px;background:${C[50]};color:${C[600]};display:flex;align-items:center;justify-content:center">${icon(n, `width:${ic}px;height:${ic}px`)}</div>
+    <div style="font-size:${fs}px;font-weight:700;color:var(--ink);text-align:center;line-height:1.35">${label}</div></div>`;
+
+const PHONE = { w: 252, h: 520, pad: 11 }, PHONE_W = 375;
+const PHONE_K = (PHONE.w - 2 * PHONE.pad) / PHONE_W, PHONE_H = Math.round((PHONE.h - 2 * PHONE.pad) / PHONE_K);
+const phoneStore = (st) => {
+  const three = st.items.length === 3;
+  const screen = `<div style="position:absolute;top:0;right:0;width:${PHONE_W}px;height:${PHONE_H}px;transform:scale(${PHONE_K});transform-origin:top right;background:${C[50]}">
+    <div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:6px 30px 0">
+      <span class="num" style="font-size:16px;font-weight:700;color:var(--ink)">9:41</span>
+      <span style="display:flex;gap:5px;align-items:center"><span style="width:24px;height:12px;border-radius:4px;border:1.5px solid var(--ink);padding:1.5px;display:flex"><span style="flex:1;border-radius:2px;background:var(--ink)"></span></span></span>
+    </div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:112px;height:32px;border-radius:16px;background:${INK}"></div>
+    <div style="height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#fff;border-bottom:1px solid ${C[100]};color:var(--ink)">
+      ${icon("menu", "width:24px;height:24px")}
+      <img src="${H}" style="height:30px">
+      <span style="display:flex;gap:14px">${icon("search", "width:23px;height:23px")}${icon("shopping-bag", "width:23px;height:23px")}</span>
+    </div>
+    <div style="padding:16px">${storeHero(st, { h: 268, pad: 24, hs: 30, ts: 15, bs: 15, ghost: 300 })}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px">
+      ${st.items.map((it, i) => serviceCard(it, i, { span: three && i === 2, chip: 48, ic: 25, fs: 15, h: three && i === 2 ? 84 : 124 })).join("")}
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:84px;background:#fff;border-top:1px solid ${C[100]};display:flex;justify-content:space-around;padding-top:14px;color:var(--muted)">
+      ${["house", "layout-grid", "shopping-bag", "user"].map((n, i) => `<span style="display:flex;flex-direction:column;align-items:center;gap:6px;${i ? "" : `color:${C[600]}`}">${icon(n, "width:25px;height:25px")}<span style="width:5px;height:5px;border-radius:50%;background:${i ? "transparent" : C[600]}"></span></span>`).join("")}
+      <span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:128px;height:5px;border-radius:3px;background:var(--ink)"></span>
+    </div>
+  </div>`;
+  const key = (side, top, h) => `<span style="position:absolute;${side}:-3px;top:${top}px;width:4px;height:${h}px;border-radius:2px;background:${INK}"></span>`;
+  return `<div style="position:relative;flex:none;width:${PHONE.w}px;height:${PHONE.h}px;filter:drop-shadow(0 28px 34px rgba(13,18,28,.28))">
+    ${key("left", 110, 30)}${key("left", 160, 52)}${key("left", 222, 52)}${key("right", 170, 80)}
+    ${phoneShell(`position:relative;width:${PHONE.w}px;height:${PHONE.h}px`, "position:relative;overflow:hidden", screen, { r: 46, pad: PHONE.pad })}
+  </div>`;
+};
+
+const DESK = { w: 700, bar: 38 }, DESK_W = 1280, DESK_K = DESK.w / DESK_W, DESK_H = 760;
+const deskStore = (st) => `<div style="flex:none;width:${DESK.w}px;border-radius:14px;overflow:hidden;background:#fff;border:1px solid ${C[200]};box-shadow:0 30px 60px -30px rgba(13,18,28,.4)">
+    <div style="height:${DESK.bar}px;display:flex;align-items:center;gap:14px;padding:0 14px;background:${C[100]};direction:ltr">
+      <span style="display:flex;gap:7px">${["#FF5F57", "#FEBC2E", "#28C840"].map((c) => `<span style="width:11px;height:11px;border-radius:50%;background:${c}"></span>`).join("")}</span>
+      <span style="flex:1;max-width:380px;margin:0 auto;height:22px;border-radius:11px;background:#fff;display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted)">
+        ${icon("lock", "width:12px;height:12px")}<span style="height:6px;width:150px;border-radius:3px;background:${C[200]}"></span></span>
+      <span style="width:54px"></span>
+    </div>
+    <div style="position:relative;height:${Math.round(DESK_H * DESK_K)}px;overflow:hidden;background:${C[50]}">
+      <div style="position:absolute;top:0;right:0;width:${DESK_W}px;height:${DESK_H}px;transform:scale(${DESK_K});transform-origin:top right">
+        <div style="height:88px;display:flex;align-items:center;gap:40px;padding:0 40px;background:#fff;border-bottom:1px solid ${C[100]}">
+          <img src="${H}" style="height:42px">
+          <span style="display:flex;gap:32px;font-size:18px;font-weight:500;color:var(--ink-2)">${st.items.map(({ label }) => `<span>${label}</span>`).join("")}</span>
+          <span style="flex:1"></span>
+          <span style="display:flex;gap:22px;color:var(--ink)">${icon("search", "width:26px;height:26px")}${icon("user", "width:26px;height:26px")}${icon("shopping-bag", "width:26px;height:26px")}</span>
+        </div>
+        <div style="padding:30px 40px">${storeHero(st, { h: 440, pad: 56, hs: 56, ts: 22, bs: 21, ghost: 560, wide: true })}</div>
+        <div style="display:grid;grid-template-columns:repeat(${st.items.length},1fr);gap:20px;padding:0 40px">
+          ${st.items.map((it, i) => serviceCard(it, i, { chip: 60, ic: 30, fs: 20, h: 150 })).join("")}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+add("mockups", MK.social && MK.social.length ? true : "no mockups", () => {
+  const out = [slide(`
+  <div class="body" style="top:196px;display:flex;gap:44px;align-items:center;justify-content:center">
+    ${MK.social.map(post).join("")}
+  </div>
+`, { title: fmt(MK.title), kicker: MK.kicker })];
+  if (MK.store) out.push(slide(`
+  <div class="body" style="top:192px;bottom:76px;display:flex;gap:70px;align-items:center;justify-content:center">
+    ${deskStore(MK.store)}
+    ${phoneStore(MK.store)}
+  </div>
+`, { title: fmt(MK.storeTitle), kicker: MK.kicker }));
+  return out;
+});
+
+add("banners", BN.items && BN.items.length ? true : "no banners", () => BN.items.map((b, i) => banner(i + 1, b, BANNER[b.type](b), b.type === "values")));
+
+/* last — closing */
+add("closing", true, () => slide(`
+  <div class="ghost" style="width:700px;right:-140px;top:-100px;opacity:.08">${mark("#fff")}</div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;color:#fff;text-align:center">
+    <div style="font-size:30px;color:var(--c-300)">${B.closing.thanks}</div>
+    <img src="${LOGO.horizontal.onDark}" style="width:520px">
+    <div style="font-size:24px;color:var(--c-100);max-width:820px;line-height:1.8;margin-top:10px">${fmt(B.closing.text)}</div>
+    <div style="font-size:18px;color:var(--c-300);margin-top:6px">${fmt(B.closing.copyright)}</div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0">${teethRow(1440, 22, C[500], true)}<div style="height:16px;background:${C[500]}"></div></div>
+`, { dark: true }));
+
+document.getElementById("deck").innerHTML = S.join("");
+document.body.dataset.slides = S.length;
+document.body.dataset.skipped = SKIPPED.join(" | ");
+</script>
+</body>
+</html>

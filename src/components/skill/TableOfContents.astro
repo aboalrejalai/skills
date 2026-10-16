@@ -1,0 +1,53 @@
+---
+// Table of contents built from the h2/h3 headings of SKILL.md. OWNER: skill-page agent (A8).
+import { ChevronDown, TableOfContents as TocIcon } from '@lucide/astro';
+import { skillStrings } from '../../i18n/strings/skill';
+import type { Heading } from '../../lib/markdown';
+import type { Lang } from '../../lib/types';
+import { sectionTitle } from './ui';
+
+interface Props {
+  lang: Lang;
+  headings: Heading[];
+  /** "side" = desktop sidebar list, "inline" = collapsible block above the content (mobile). */
+  variant: 'side' | 'inline';
+  class?: string;
+}
+const { lang, headings, variant, class: className } = Astro.props;
+const t = skillStrings[lang];
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const link =
+  'flex min-h-11 items-center rounded-md py-1 pe-2 text-sm leading-6 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=true]:bg-primary-subtle aria-[current=true]:font-medium aria-[current=true]:text-primary';
+---
+{items.length >= 2 && (
+  variant === 'side' ? (
+    <nav aria-label={t.toc} class={className} data-toc>
+      <h2 class={`${sectionTitle} mb-2 px-1 text-sm`}>
+        <TocIcon class="size-4 text-primary" aria-hidden="true" />{t.toc}
+      </h2>
+      <ol class="flex flex-col">
+        {items.map((h) => (
+          <li>
+            <a href={`#${h.slug}`} class:list={[link, h.depth === 3 ? 'ps-5' : 'ps-2']} data-toc-link><bdi>{h.text}</bdi></a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  ) : (
+    <details class:list={['group rounded-xl border border-border bg-card', className]}>
+      <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-4 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+        <span class="flex items-center gap-2"><TocIcon class="size-4 text-primary" aria-hidden="true" />{t.toc}</span>
+        <ChevronDown class="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />
+      </summary>
+      <nav aria-label={t.toc} class="border-t border-border px-2 py-2">
+        <ol class="flex flex-col">
+          {items.map((h) => (
+            <li>
+              <a href={`#${h.slug}`} class:list={[link, h.depth === 3 ? 'ps-5' : 'ps-2']}><bdi>{h.text}</bdi></a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+  )
+)}

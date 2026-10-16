@@ -1,0 +1,644 @@
+# كتالوج المهارات: قائمة يدوية بالمهارات التي صنعها محمد أبوالرجال أو يستخدمها أو يوصي بها.
+# لإضافة مهارة: أضف عنصرًا تحت skills فيه source (owner/repo كما في GitHub) و path (مجلد SKILL.md، أو "" إن كان في جذر المستودع)
+# و name (قيمة name في SKILL.md) و category (من CATEGORIES في src/lib/types.ts) و tags (made | use | recommend | favorite).
+# Curated catalog: skills Mohammed Abo Alrejal made, uses, or recommends. To add one, append an item under `skills:`
+# with source, path, name, category and tags (ref and note are optional). Skills in ./skills are auto-discovered;
+# list them under `local:` only to set category, tags and note. Whole repos shown as one card go under `collections:`.
+
+skills:
+  # ─── code-quality ───────────────────────────────────────────────
+  - source: amElnagdy/guard-skills
+    path: skills/clean-code-guard
+    ref: master
+    name: clean-code-guard
+    category: code-quality
+    tags: [use, recommend, favorite]
+    note: { ar: "أراجع به كل كود يكتبه الوكيل قبل أن أعرضه أو أدمجه.", en: "My review gate for any production code an agent writes before it ships." }
+  - source: amElnagdy/guard-skills
+    path: skills/docs-guard
+    ref: master
+    name: docs-guard
+    category: code-quality
+    tags: [use, recommend]
+    note: { ar: "يطابق التوثيق مع الكود ويحذف الادعاءات التي لا يمكن التحقق منها.", en: "Checks docs against the source and strips unverifiable claims." }
+  - source: amElnagdy/guard-skills
+    path: skills/wp-guard
+    ref: master
+    name: wp-guard
+    category: code-quality
+    tags: [recommend]
+    note: { ar: "حارس مراجعة لكود ووردبريس من نفس مجموعة الحراس.", en: "The WordPress review guard from the same guard set." }
+  - source: amElnagdy/guard-skills
+    path: skills/woo-guard
+    ref: master
+    name: woo-guard
+    category: code-quality
+    tags: [recommend]
+    note: { ar: "حارس مراجعة لإضافات ووكومرس وكودها.", en: "The WooCommerce review guard from the same guard set." }
+  - source: amElnagdy/review-skills
+    path: skills/debate-review
+    ref: master
+    name: debate-review
+    category: code-quality
+    tags: [use, recommend]
+    note: { ar: "مراجعة طلب الدمج بنموذجين يتناقشان ثم تُنشر الملاحظات على الأسطر.", en: "Two models debate a PR and post inline review comments." }
+  - source: amElnagdy/review-skills
+    path: skills/babysit-pr
+    ref: master
+    name: babysit-pr
+    category: code-quality
+    tags: [use]
+    note: { ar: "يتابع طلب الدمج خلال جولات مراجعة البوتات: يتحقق ويصلح ويرد.", en: "Walks a PR through bot review rounds: verify, fix, reply, resolve." }
+  - source: mattpocock/skills
+    path: skills/engineering/codebase-design
+    name: codebase-design
+    category: code-quality
+    tags: [use, recommend]
+    note: { ar: "مفردات مشتركة لتصميم وحدات عميقة وواجهات أبسط.", en: "Shared vocabulary for designing deep modules and simpler interfaces." }
+  - source: mattpocock/skills
+    path: skills/engineering/improve-codebase-architecture
+    name: improve-codebase-architecture
+    category: code-quality
+    tags: [use]
+    note: { ar: "يمسح المشروع بحثًا عن فرص تعميق الوحدات ويعرضها في تقرير.", en: "Scans a codebase for deepening opportunities and reports them." }
+  - source: mattpocock/skills
+    path: skills/in-progress/setup-ts-deep-modules
+    name: setup-ts-deep-modules
+    category: code-quality
+    tags: [use]
+    note: { ar: "يضبط dependency-cruiser ليبقى كل حزمة TypeScript وحدة عميقة.", en: "Wires dependency-cruiser so each TypeScript package stays a deep module." }
+  - source: affaan-m/ECC
+    path: skills/production-audit
+    name: production-audit
+    category: code-quality
+    tags: [use]
+    note: { ar: "فحص جاهزية التطبيق للإنتاج قبل الإطلاق وبعد الدمج.", en: "Production-readiness audit before launch or after a merge." }
+
+  # ─── testing ────────────────────────────────────────────────────
+  - source: amElnagdy/guard-skills
+    path: skills/test-guard
+    ref: master
+    name: test-guard
+    category: testing
+    tags: [use, recommend, favorite]
+    note: { ar: "يمنع تضخم الاختبارات التي يولدها الوكيل ويراجعها قبل الدمج.", en: "Stops AI test bloat and reviews generated tests before merge." }
+  - source: mattpocock/skills
+    path: skills/engineering/tdd
+    name: tdd
+    category: testing
+    tags: [use, recommend]
+    note: { ar: "تطوير موجّه بالاختبارات: أحمر ثم أخضر ثم إعادة هيكلة.", en: "Test-first development: red, green, refactor." }
+  - source: mattpocock/skills
+    path: skills/engineering/diagnosing-bugs
+    name: diagnosing-bugs
+    category: testing
+    tags: [use, recommend]
+    note: { ar: "حلقة تشخيص منظمة للأخطاء الصعبة وتراجع الأداء.", en: "A structured diagnosis loop for hard bugs and slowdowns." }
+  - source: tester-army/e2e
+    path: skills/e2e
+    name: e2e
+    category: testing
+    tags: [use, recommend]
+    note: { ar: "يكتب اختبارات طرف لطرف للويب والجوال ويشغلها ويصلح أعطالها.", en: "Writes, runs and debugs end-to-end tests for web and mobile apps." }
+  - source: tester-army/e2e
+    path: skills/create-verification-skill
+    name: create-verification-skill
+    category: testing
+    tags: [use]
+    note: { ar: "ينشئ مهارة تحقق خاصة بالمشروع فوق e2e.", en: "Generates a project-local verify skill on top of e2e." }
+  - source: anthropics/skills
+    path: skills/webapp-testing
+    name: webapp-testing
+    category: testing
+    tags: [use, recommend]
+    note: { ar: "اختبار تطبيقات الويب المحلية عبر Playwright.", en: "Tests local web apps with Playwright." }
+
+  # ─── planning-workflow ──────────────────────────────────────────
+  - source: mattpocock/skills
+    path: skills/productivity/grilling
+    name: grilling
+    category: planning-workflow
+    tags: [use, recommend]
+    note: { ar: "يستجوبني بلا هوادة حول الخطة أو القرار حتى تتضح الثغرات.", en: "Grills me on a plan or decision until the gaps show." }
+  - source: mattpocock/skills
+    path: skills/productivity/grill-me
+    name: grill-me
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "مقابلة صارمة لشحذ الخطة أو التصميم.", en: "A relentless interview to sharpen a plan or design." }
+  - source: mattpocock/skills
+    path: skills/engineering/grill-with-docs
+    name: grill-with-docs
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "نفس الاستجواب مع كتابة سجلات القرار والمسرد أثناءه.", en: "The same grilling, writing ADRs and a glossary along the way." }
+  - source: mattpocock/skills
+    path: skills/engineering/domain-modeling
+    name: domain-modeling
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يبني نموذج المجال ومصطلحاته في CONTEXT.md وسجلات القرار.", en: "Builds the domain model and its terms in CONTEXT.md and ADRs." }
+  - source: mattpocock/skills
+    path: skills/engineering/prototype
+    name: prototype
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "نموذج أولي سريع يُرمى بعد أن يجيب عن سؤال التصميم.", en: "A throwaway prototype that answers one design question." }
+  - source: mattpocock/skills
+    path: skills/engineering/to-spec
+    name: to-spec
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يحوّل المحادثة إلى مواصفة ويضعها في متتبع المهام.", en: "Turns the conversation into a spec in the issue tracker." }
+  - source: mattpocock/skills
+    path: skills/engineering/to-tickets
+    name: to-tickets
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يقسم الخطة إلى تذاكر صغيرة بترتيب واضح لما يعيق ماذا.", en: "Splits a plan into tracer-bullet tickets with blocking edges." }
+  - source: mattpocock/skills
+    path: skills/engineering/implement
+    name: implement
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "ينفذ العمل انطلاقًا من مواصفة أو مجموعة تذاكر.", en: "Implements work from a spec or a set of tickets." }
+  - source: mattpocock/skills
+    path: skills/engineering/implement-spec
+    name: implement-spec
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "ينفذ ناتج to-spec و to-tickets في الكود.", en: "Implements the output of to-spec and to-tickets." }
+  - source: mattpocock/skills
+    path: skills/engineering/wayfinder
+    name: wayfinder
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يخطط للأعمال الكبيرة التي لا تتسع لها جلسة واحدة كخريطة تذاكر قرار.", en: "Maps work too big for one session as decision tickets." }
+  - source: mattpocock/skills
+    path: skills/engineering/triage
+    name: triage
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يفرز المشكلات وطلبات الدمج الخارجية ويصنفها.", en: "Moves issues and outside PRs through triage states." }
+  - source: mattpocock/skills
+    path: skills/productivity/wait-what
+    name: wait-what
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يطلب من الوكيل إعادة شرح رده الأخير بوضوح.", en: "Asks the agent to re-pitch a message that did not land." }
+  - source: mattpocock/skills
+    path: skills/engineering/ask-matt
+    name: ask-matt
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يدلني على المهارة المناسبة من مجموعة Matt Pocock.", en: "Routes me to the right skill in Matt Pocock's set." }
+  - source: mattpocock/skills
+    path: skills/engineering/setup-matt-pocock-skills
+    name: setup-matt-pocock-skills
+    category: planning-workflow
+    tags: [use]
+    note: { ar: "يهيئ المستودع لمهارات Matt Pocock الهندسية.", en: "Sets a repo up for Matt Pocock's engineering skills." }
+
+  # ─── agents-delegation ──────────────────────────────────────────
+  - source: amElnagdy/delegate-skills
+    path: skills/codex-delegate
+    ref: master
+    name: codex-delegate
+    category: agents-delegation
+    tags: [use, recommend, favorite]
+    note: { ar: "أسلّم التنفيذ لـ Codex في الخلفية ثم أراجع الفرق وأدمجه بنفسي.", en: "Hands implementation to Codex in the background; I review and land the diff." }
+  - source: amElnagdy/delegate-skills
+    path: skills/claude-delegate
+    ref: master
+    name: claude-delegate
+    category: agents-delegation
+    tags: [use, recommend]
+    note: { ar: "تفويض التنفيذ لجلسة Claude Code منفصلة مع بقائي مراجعًا.", en: "Delegates implementation to a separate Claude Code session; I stay the reviewer." }
+  - source: amElnagdy/delegate-skills
+    path: skills/cursor-delegate
+    ref: master
+    name: cursor-delegate
+    category: agents-delegation
+    tags: [use]
+    note: { ar: "تفويض التنفيذ إلى Cursor Agent CLI.", en: "Delegates implementation to the Cursor Agent CLI." }
+  - source: amElnagdy/delegate-skills
+    path: skills/agy-delegate
+    ref: master
+    name: agy-delegate
+    category: agents-delegation
+    tags: [use]
+    note: { ar: "تفويض التنفيذ إلى Google Antigravity CLI.", en: "Delegates implementation to the Google Antigravity CLI." }
+  - source: amElnagdy/delegate-skills
+    path: skills/opencode-delegate
+    ref: master
+    name: opencode-delegate
+    category: agents-delegation
+    tags: [use]
+    note: { ar: "تفويض التنفيذ إلى OpenCode CLI.", en: "Delegates implementation to the OpenCode CLI." }
+  - source: amElnagdy/delegate-skills
+    path: skills/zcode-delegate
+    ref: master
+    name: zcode-delegate
+    category: agents-delegation
+    tags: [use]
+    note: { ar: "تفويض التنفيذ إلى Z.AI ZCode CLI.", en: "Delegates implementation to the Z.AI ZCode CLI." }
+  - source: amElnagdy/delegate-skills
+    path: skills/delegate-setup
+    ref: master
+    name: delegate-setup
+    category: agents-delegation
+    tags: [use]
+    note: { ar: "يحدد أي أداة تنفيذ تتولى أي نوع من العمل.", en: "Sets which implementer CLI handles which kind of work." }
+  - source: anthropics/skills
+    path: skills/skill-creator
+    name: skill-creator
+    category: agents-delegation
+    tags: [use, recommend]
+    note: { ar: "أنشئ به المهارات وأحسّنها وأقيس أداءها.", en: "Creates, improves and evaluates skills." }
+  - source: mattpocock/skills
+    path: skills/productivity/writing-for-agents
+    name: writing-for-agents
+    category: agents-delegation
+    tags: [use, recommend]
+    note: { ar: "قواعد كتابة المهارات وملفات AGENTS.md و CLAUDE.md.", en: "How to write skills, AGENTS.md and CLAUDE.md." }
+  - source: vercel-labs/skills
+    path: skills/find-skills
+    name: find-skills
+    category: agents-delegation
+    tags: [use, recommend]
+    note: { ar: "يبحث عن مهارة مناسبة ويثبتها عند الحاجة.", en: "Finds and installs a fitting skill when I need one." }
+  - source: anthropics/skills
+    path: skills/mcp-builder
+    name: mcp-builder
+    category: agents-delegation
+    tags: [use, recommend]
+    note: { ar: "دليل بناء خوادم MCP جيدة بـ Python أو TypeScript.", en: "Guide to building solid MCP servers in Python or TypeScript." }
+
+  # ─── frontend-design ────────────────────────────────────────────
+  - source: aboalrejalai/design-md
+    path: design-creator
+    name: design-creator
+    category: frontend-design
+    tags: [made]
+    note: { ar: "يستخرج نظام تصميم كاملًا من موقع حي أو من ملفات المشروع.", en: "Builds a full design-system package from a live site or a codebase." }
+
+  # ─── video-media ────────────────────────────────────────────────
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes
+    name: hyperframes
+    category: video-media
+    tags: [use, recommend, favorite]
+    note: { ar: "نقطة البداية لأي فيديو أو حركة أصنعها بالكود.", en: "My entry point for any video or motion graphic built in code." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-core
+    name: hyperframes-core
+    category: video-media
+    tags: [use]
+    note: { ar: "عقد بناء مشروع HyperFrames قابل للتصيير.", en: "The HyperFrames composition contract." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-animation
+    name: hyperframes-animation
+    category: video-media
+    tags: [use]
+    note: { ar: "قواعد الحركة والانتقالات ومحركات التحريك في HyperFrames.", en: "Motion rules, transitions and animation runtimes for HyperFrames." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-audio
+    name: hyperframes-audio
+    category: video-media
+    tags: [use]
+    note: { ar: "مزج الصوت داخل المشروع: تلاشٍ وتداخل وضبط مستوى.", en: "Mixes audio in a composition: fades, crossfades, gain." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-cli
+    name: hyperframes-cli
+    category: video-media
+    tags: [use]
+    note: { ar: "دورة العمل بأداة HyperFrames من الإنشاء حتى التصيير.", en: "The HyperFrames CLI loop from init to render." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-creative
+    name: hyperframes-creative
+    category: video-media
+    tags: [use]
+    note: { ar: "التوجيه البصري غير الحركي: الألوان والخطوط ومواصفة التصميم.", en: "Non-motion creative direction: palettes, type, design spec." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-keyframes
+    name: hyperframes-keyframes
+    category: video-media
+    tags: [use]
+    note: { ar: "تقريب وتبعيد وحركة كاميرا وإعادة تأطير.", en: "Punch-ins, zooms, reframes and camera moves." }
+  - source: heygen-com/hyperframes
+    path: skills/hyperframes-registry
+    name: hyperframes-registry
+    category: video-media
+    tags: [use]
+    note: { ar: "يبحث في سجل الكتل والمكونات الجاهزة ويركّبها.", en: "Finds and wires registry blocks and components." }
+  - source: heygen-com/hyperframes
+    path: skills/general-video
+    name: general-video
+    category: video-media
+    tags: [use]
+    note: { ar: "فيديو مخصص حين لا يناسب أي مسار متخصص.", en: "Custom compositions when no specialized workflow fits." }
+  - source: heygen-com/hyperframes
+    path: skills/motion-graphics
+    name: motion-graphics
+    category: video-media
+    tags: [use]
+    note: { ar: "موشن جرافيك قصير تكون الحركة فيه هي الرسالة.", en: "Short design-led motion graphics where motion is the message." }
+  - source: heygen-com/hyperframes
+    path: skills/product-launch-video
+    name: product-launch-video
+    category: video-media
+    tags: [use]
+    note: { ar: "فيديو إطلاق أو ترويج لمنتج من رابطه أو نص مكتوب.", en: "Launch or promo videos from a product URL or a script." }
+  - source: heygen-com/hyperframes
+    path: skills/faceless-explainer
+    name: faceless-explainer
+    category: video-media
+    tags: [use]
+    note: { ar: "فيديو شرح بلا وجه من نص أو مقال.", en: "Faceless explainer videos from text or an article." }
+  - source: heygen-com/hyperframes
+    path: skills/embedded-captions
+    name: embedded-captions
+    category: video-media
+    tags: [use]
+    note: { ar: "ترجمة مدمجة لفيديو متحدث دون تعديل اللقطات.", en: "Captions for talking-head video without editing the footage." }
+  - source: heygen-com/hyperframes
+    path: skills/talking-head-recut
+    name: talking-head-recut
+    category: video-media
+    tags: [use]
+    note: { ar: "بطاقات رسومية متزامنة فوق فيديو مقابلة أو بودكاست.", en: "Timed graphic overlay cards on interview or podcast video." }
+  - source: heygen-com/hyperframes
+    path: skills/music-to-video
+    name: music-to-video
+    category: video-media
+    tags: [use]
+    note: { ar: "فيديو متزامن مع إيقاع مقطع موسيقي.", en: "Beat-synced video from a music track." }
+  - source: heygen-com/hyperframes
+    path: skills/pr-to-video
+    name: pr-to-video
+    category: video-media
+    tags: [use]
+    note: { ar: "فيديو يشرح تغييرات طلب دمج على GitHub.", en: "A code-change explainer video from a GitHub PR." }
+  - source: heygen-com/hyperframes
+    path: skills/slideshow
+    name: slideshow
+    category: video-media
+    tags: [use]
+    note: { ar: "عرض شرائح تفاعلي مبني بـ HyperFrames.", en: "Interactive slide decks built with HyperFrames." }
+  - source: heygen-com/hyperframes
+    path: skills/figma
+    name: figma
+    category: video-media
+    tags: [use]
+    note: { ar: "يجلب تصاميم Figma وهويتها إلى مشروع فيديو.", en: "Brings Figma designs and brand tokens into a composition." }
+  - source: heygen-com/hyperframes
+    path: skills/media-use
+    name: media-use
+    category: video-media
+    tags: [use]
+    note: { ar: "يوفر الموسيقى والمؤثرات والصور والشعارات للمشروع.", en: "Resolves music, SFX, images and logos for a project." }
+  - source: heygen-com/hyperframes
+    path: skills/remotion-to-hyperframes
+    name: remotion-to-hyperframes
+    category: video-media
+    tags: [use]
+    note: { ar: "ينقل مشروع Remotion إلى HyperFrames.", en: "Ports a Remotion composition to HyperFrames." }
+  - source: latent-spaces/brag
+    path: skills/brag
+    name: brag
+    category: video-media
+    tags: [use, recommend]
+    note: { ar: "يحوّل موقع المشروع إلى فيديو إطلاق قصير قابل للمشاركة.", en: "Turns a project site into a short shareable launch video." }
+  - source: latent-spaces/brag
+    path: skills/brag-slim
+    name: brag-slim
+    category: video-media
+    tags: [use]
+    note: { ar: "نسخة خفيفة من brag في ملف واحد بلا أصول مرفقة.", en: "A one-file version of brag with no bundled assets." }
+
+  # ─── seo-marketing ──────────────────────────────────────────────
+  - source: every-app/open-seo
+    path: .agents/skills/seo-coach
+    name: seo-coach
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "مدرب OpenSEO يشرح الخطوات ويقترح التالي.", en: "OpenSEO coach that explains workflows and next steps." }
+  - source: every-app/open-seo
+    path: .agents/skills/seo-project-setup
+    name: seo-project-setup
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يجهز سياق مشروع السيو: النطاق والأهداف والمنافسين.", en: "Sets up a project's SEO context: scope, goals, competitors." }
+  - source: every-app/open-seo
+    path: .agents/skills/keyword-research
+    name: keyword-research
+    category: seo-marketing
+    tags: [use, recommend]
+    note: { ar: "يكتشف فرص الكلمات المفتاحية ويقيّم نتائج البحث.", en: "Finds keyword opportunities and evaluates SERPs." }
+  - source: every-app/open-seo
+    path: .agents/skills/keyword-clustering
+    name: keyword-clustering
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يجمع الكلمات حسب نية البحث ويربطها بالصفحات.", en: "Clusters keywords by intent and maps them to pages." }
+  - source: every-app/open-seo
+    path: .agents/skills/competitor-analysis
+    name: competitor-analysis
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يحلل حضور منافس واحد في البحث وكلماته وروابطه.", en: "Analyzes one competitor's rankings, content and backlinks." }
+  - source: every-app/open-seo
+    path: .agents/skills/competitive-landscape
+    name: competitive-landscape
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يرسم خريطة المتصدرين في السوق والفجوات المتاحة.", en: "Maps market leaders, themes and gaps." }
+  - source: every-app/open-seo
+    path: .agents/skills/link-prospecting
+    name: link-prospecting
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يجد فرص الروابط الخلفية ويصوغ رسائل التواصل.", en: "Finds link prospects and drafts outreach." }
+  - source: every-app/open-seo
+    path: .agents/skills/local-seo
+    name: local-seo
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يدقق ملف النشاط في خرائط Google ويقارنه بالمنافسين المحليين.", en: "Audits a Google Business Profile against local competitors." }
+  - source: every-app/open-seo
+    path: .agents/skills/seo-report
+    name: seo-report
+    category: seo-marketing
+    tags: [use]
+    note: { ar: "يكتب تقرير السيو في صفحة HTML واحدة.", en: "Writes an SEO report as one self-contained HTML page." }
+
+  # ─── research-tools ─────────────────────────────────────────────
+  - source: aboalrejalai/find-oss
+    path: ""
+    name: find-oss
+    category: research-tools
+    tags: [made, use, favorite]
+    note: { ar: "يجد أداة مفتوحة المصدر للحاجة ويفحصها ويثبتها، ومعها رادار الرائج وبدائل الأدوات المدفوعة.", en: "Finds, vets and installs open-source tools, with a trending radar and paid-tool alternatives." }
+  - source: mattpocock/skills
+    path: skills/engineering/research
+    name: research
+    category: research-tools
+    tags: [use, recommend]
+    note: { ar: "يبحث في المصادر الأولية الموثوقة ويحفظ النتائج في ملف Markdown.", en: "Researches primary sources and saves the findings as Markdown." }
+  - source: Panniantong/Agent-Reach
+    path: agent_reach/skill
+    name: agent-reach
+    category: research-tools
+    tags: [use]
+    note: { ar: "يبحث في الإنترنت وعبر 15 منصة من مكان واحد.", en: "Searches the web and 15 platforms from one place." }
+
+  # ─── security ───────────────────────────────────────────────────
+  - source: cloudflare/security-audit-skill
+    path: skills/security-audit
+    name: security-audit
+    category: security
+    tags: [use, recommend]
+    note: { ar: "تدقيق أمني يركز على الثغرات القابلة للاستغلال فعلًا.", en: "Security audit focused on exploitable issues with real impact." }
+
+  # ─── backend-data ───────────────────────────────────────────────
+  - source: supabase/agent-skills
+    path: skills/supabase
+    name: supabase
+    category: backend-data
+    tags: [use]
+    note: { ar: "مرجعي لأي عمل على Supabase: قاعدة البيانات والمصادقة والدوال.", en: "My go-to for any Supabase work: database, auth, functions." }
+  - source: supabase/agent-skills
+    path: skills/supabase-postgres-best-practices
+    name: supabase-postgres-best-practices
+    category: backend-data
+    tags: [use, recommend]
+    note: { ar: "أفضل ممارسات Postgres قبل كتابة أي استعلام أو ترحيل.", en: "Postgres best practices before writing queries or migrations." }
+
+  # ─── pending: my own skills in private repos (uncomment once the repo is public) ───
+  # All paths and names below were verified on each repo's default branch (main).
+  # - source: aboalrejalai/saudi-soft
+  #   path: skills/saudi-soft
+  #   name: saudi-soft
+  #   category: frontend-design
+  #   tags: [made, use, favorite]
+  #   note: { ar: "أبني به تطبيقات React بهوية Saudi Soft، وهو أساس تصميم هذا الموقع.", en: "Builds React apps in the Saudi Soft identity; this site uses it." }
+  # - source: aboalrejalai/saudi-nds-ui
+  #   path: skills/saudi-nds-ui
+  #   name: saudi-nds-ui
+  #   category: frontend-design
+  #   tags: [made]
+  #   note: { ar: "يبني الواجهات وفق نظام التصميم الوطني السعودي من هيئة الحكومة الرقمية.", en: "Builds UIs that follow Saudi Arabia's National Design System." }
+  # - source: aboalrejalai/NeuronWriter-MCP
+  #   path: skills/neuronwriter-api
+  #   name: neuronwriter-api
+  #   category: seo-marketing
+  #   tags: [made]
+  #   note: { ar: "تكامل كامل مع واجهة NEURONwriter لتحسين المحتوى.", en: "Full NEURONwriter API integration for content optimization." }
+  # kickoff-motion (aboalrejalai/kickoff-motion, private). kickoff-screenshots is not pushed yet.
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-product-images, name: kickoff-product-images, category: video-media, tags: [made, use] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-explainer-film, name: kickoff-explainer-film, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-motion-reel, name: kickoff-motion-reel, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-video-editor, name: kickoff-video-editor, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-arabic-voiceover, name: kickoff-arabic-voiceover, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-layered-timeline, name: kickoff-layered-timeline, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-worldtrip, name: kickoff-worldtrip, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-claude-cartoon, name: kickoff-claude-cartoon, category: video-media, tags: [made] }
+  # - { source: aboalrejalai/kickoff-motion, path: skills/kickoff-tawlidsuwar, name: kickoff-tawlidsuwar, category: video-media, tags: [made] }
+  # salla-skills (aboalrejalai/salla-skills, private): 34 skills, all under skills/<name>, all category ecommerce-salla, tags [made, use].
+  # - { source: aboalrejalai/salla-skills, path: skills/salla, name: salla, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-mcp, name: salla-mcp, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-mcp-catalog, name: salla-mcp-catalog, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-mcp-design, name: salla-mcp-design, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-mcp-insights, name: salla-mcp-insights, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-mcp-operations, name: salla-mcp-operations, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-addon-purchase, name: salla-addon-purchase, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-addon-purchase-embedded, name: salla-addon-purchase-embedded, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-api-core, name: salla-api-core, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-auth, name: salla-app-auth, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-billing, name: salla-app-billing, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-builder, name: salla-app-builder, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-expert, name: salla-app-expert, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-functions, name: salla-app-functions, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-functions-design, name: salla-app-functions-design, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-functions-handler, name: salla-app-functions-handler, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-functions-release, name: salla-app-functions-release, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-functions-test, name: salla-app-functions-test, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-functions-validate, name: salla-app-functions-validate, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-lifecycle, name: salla-app-lifecycle, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-settings, name: salla-app-settings, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-app-ui-builder, name: salla-app-ui-builder, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-communication-app, name: salla-communication-app, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-docs, name: salla-docs, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-embedded-app, name: salla-embedded-app, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-embedded-ui, name: salla-embedded-ui, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-live-testing, name: salla-live-testing, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-publication-consistency, name: salla-publication-consistency, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-shipping-app, name: salla-shipping-app, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-snippets, name: salla-snippets, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-snippets-migration, name: salla-snippets-migration, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-storefront-ui, name: salla-storefront-ui, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-theme-builder, name: salla-theme-builder, category: ecommerce-salla, tags: [made, use] }
+  # - { source: aboalrejalai/salla-skills, path: skills/salla-webhooks, name: salla-webhooks, category: ecommerce-salla, tags: [made, use] }
+  # athar (aboalrejalai/athar, private vault): its .agents/skills/{athar,athar-setup,athar-vault} are only local (43 commits not pushed).
+  # Once pushed and public: path .agents/skills/<name>, category memory-knowledge, tags [made, use] (+ favorite for athar).
+
+local:
+  # ─── planning-workflow: the kickoff line ────────────────────────
+  - name: kickoff-plan
+    category: planning-workflow
+    tags: [made, use, favorite]
+    note: { ar: "طريقتي في التخطيط وأول محطة في خط kickoff: مهام صغيرة لكل منها فحص يشغّله الوكيل.", en: "My planning method and the first kickoff station: atomic tasks, each with a check the agent runs." }
+  - name: kickoff-implement
+    category: planning-workflow
+    tags: [made, use, favorite]
+    note: { ar: "ينفذ ملف الخطة مهمة مهمة على فرع مستقل ويسجل دليل كل فحص.", en: "Executes the plan task by task on a branch and logs each check's evidence." }
+  - name: kickoff-review
+    category: planning-workflow
+    tags: [made, use, favorite]
+    note: { ar: "يراجع الفرع مقابل خطته بعمق يحدده مستوى الخطورة ثم يعطيني الحكم.", en: "Reviews the branch against its plan, depth set by risk, and gives me a verdict." }
+  - name: kickoff-ship
+    category: planning-workflow
+    tags: [made, use]
+    note: { ar: "يرفع الفرع ويفتح طلب الدمج وينتظر CI ثم يدمج بعد موافقتي.", en: "Pushes the branch, opens the PR, waits for CI and merges after my approval." }
+  - name: kickoff-setup
+    category: planning-workflow
+    tags: [made, use]
+    note: { ar: "يثبت أساس kickoff على الجهاز ويهيئ المشروع لخط العمل.", en: "Installs the kickoff foundation and sets a project up for the line." }
+  - name: kickoff-using
+    category: planning-workflow
+    tags: [made, use]
+    note: { ar: "خريطة المهارات المتخصصة التي تستدعيها كل محطة في خط kickoff.", en: "Map of the specialist skills each kickoff station calls." }
+
+  # ─── frontend-design ────────────────────────────────────────────
+  - name: kickoff-guidelines
+    category: frontend-design
+    tags: [made, use]
+    note: { ar: "يبني دليل الهوية في 28 شريحة من الشعار والألوان والخط.", en: "Builds a 28-slide brand guidelines deck from the logo, colours and font." }
+
+  # ─── documents ──────────────────────────────────────────────────
+  - name: tawa-najd
+    category: documents
+    tags: [made, use]
+    note: { ar: "يصدر مستندات شركة طوع نجد الرسمية على ورقها: عروض أسعار وعقود وفواتير وخطابات.", en: "Issues Tawa Najd's official papers: quotes, contracts, invoices, letters." }
+  - name: aboalrejal-docs
+    category: documents
+    tags: [made, use]
+    note: { ar: "يصدر مستنداتي الشخصية الرسمية بهويتي كمستقل بصيغة HTML و PDF.", en: "Issues my own official documents as a freelancer, in HTML and PDF." }
+
+collections:
+  - source: aboalrejalai/greetkit
+    category: planning-workflow
+    tags: [made]
+    title: { ar: "GreetKit", en: "GreetKit" }
+    description: { ar: "إطار مهارات للتطوير الموجّه بالنية: مواصفة ثم خطة ثم مهام ثم تنفيذ ثم مراجعة، مع حراس الجودة، في 15 مهارة.", en: "An intent-driven development kit for coding agents: spec, plan, tasks, implement, review, plus quality guards, in 15 skills." }
+  # Pending, private repos (uncomment once public):
+  # - source: aboalrejalai/marketing-skills
+  #   category: seo-marketing
+  #   tags: [made]
+  #   title: { ar: "مهارات التسويق", en: "Marketing Skills" }
+  #   description: { ar: "975 مهارة في التسويق والسيو والإعلانات والمحتوى والأمن السيبراني، مع موجّه يختار المهارة المناسبة.", en: "975 skills for marketing, SEO, ads, content and cybersecurity, with a router that picks the right one." }
+  # - source: aboalrejalai/teacher-assistant
+  #   category: documents
+  #   tags: [made]
+  #   title: { ar: "مساعد المعلم", en: "Teacher Assistant" }
+  #   description: { ar: "مهارات عربية لأعمال المعلم: الخطة الأسبوعية وملف الشواهد والخطط العلاجية وتقارير الأنشطة.", en: "Arabic teacher workflows: weekly plans, evidence files, remedial plans, activity reports." }

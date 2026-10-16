@@ -1,0 +1,23 @@
+---
+// Filter pill (Soft filter recipe): rounded-full, active = filled primary, others outline.
+// `group` + `value` are read by src/scripts/home-search.ts; aria-pressed carries the state.
+interface Props {
+  group: 'tag' | 'cat' | 'src';
+  value: string; // "" = all
+  label: string;
+  count?: number;
+  active?: boolean;
+}
+const { group, value, label, count, active = false } = Astro.props;
+---
+
+<button
+  type="button"
+  data-filter={group}
+  data-value={value}
+  aria-pressed={active ? 'true' : 'false'}
+  class="inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-card px-3.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary-hover pointer-coarse:h-11"
+>
+  {label}
+  {count !== undefined && <span class="text-xs tabular-nums opacity-75">{count.toLocaleString('en-US')}</span>}
+</button>

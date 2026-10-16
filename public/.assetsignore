@@ -1,0 +1,6 @@
+# Files in ./dist that Wrangler must not upload as public assets.
+# (_headers and _redirects are read by Wrangler as config and are never served.)
+**/*.map
+**/.DS_Store
+**/Thumbs.db
+**/.gitkeep

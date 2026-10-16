@@ -2,7 +2,7 @@
 import { existsSync, realpathSync, statSync } from 'node:fs';
 import { readFrontmatter } from './frontmatter.mjs';
 import { isInside, readSkillFolder, readText } from './files.mjs';
-import { installSkill, isOwnOwner, skillsShSkillUrl, treeUrl } from './urls.mjs';
+import { installSkill, isOwnOwner, shellWord, skillsShSkillUrl, treeUrl } from './urls.mjs';
 
 /**
  * @param {object} spec  { folder, root, source: {owner, repo, ref, path}, name, category, tags, note?, local, updatedAt? }
@@ -36,6 +36,10 @@ export async function loadSkill(spec) {
     }
   } else {
     warnings.push(`frontmatter has no name; using catalog name "${spec.name}"`);
+  }
+
+  if (shellWord(name) === undefined) {
+    warnings.push(`name ${JSON.stringify(name)} is not shell-safe; the install command falls back to --list`);
   }
 
   let description = '';

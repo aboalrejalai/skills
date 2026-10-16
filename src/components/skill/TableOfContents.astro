@@ -5,6 +5,7 @@ import { skillStrings } from '../../i18n/strings/skill';
 import type { Heading } from '../../lib/markdown';
 import type { Lang } from '../../lib/types';
 import { sectionTitle } from './ui';
+import { contentLang } from '../content-lang';
 
 interface Props {
   lang: Lang;
@@ -28,7 +29,7 @@ const link =
       <ol class="flex flex-col">
         {items.map((h) => (
           <li>
-            <a href={`#${h.slug}`} class:list={[link, h.depth === 3 ? 'ps-5' : 'ps-2']} data-toc-link><bdi>{h.text}</bdi></a>
+            <a href={`#${h.slug}`} class:list={[link, h.depth === 3 ? 'ps-5' : 'ps-2']} data-toc-link><bdi lang={contentLang(h.text)}>{h.text}</bdi></a>
           </li>
         ))}
       </ol>
@@ -43,7 +44,7 @@ const link =
         <ol class="flex flex-col">
           {items.map((h) => (
             <li>
-              <a href={`#${h.slug}`} class:list={[link, h.depth === 3 ? 'ps-5' : 'ps-2']}><bdi>{h.text}</bdi></a>
+              <a href={`#${h.slug}`} class:list={[link, h.depth === 3 ? 'ps-5' : 'ps-2']}><bdi lang={contentLang(h.text)}>{h.text}</bdi></a>
             </li>
           ))}
         </ol>

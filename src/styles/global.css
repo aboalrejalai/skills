@@ -352,3 +352,16 @@
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Filter pill row (home). sm+: pills wrap. Phones: one sideways-scrolling line with the scrollbar
+   hidden and the inline-end edge faded, so the cut-off pill reads as "more this way".
+   -m-1/p-1 keeps focus rings unclipped; pe-10 lets the last pill scroll clear of the fade. */
+@utility pill-row {
+  @apply -m-1 flex min-w-0 flex-1 gap-2 overflow-x-auto p-1 pe-10 sm:flex-wrap sm:overflow-visible sm:pe-1;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  @media (width < 40rem) {
+    mask-image: linear-gradient(to right, black calc(100% - 2.5rem), transparent);
+    &:dir(rtl) { mask-image: linear-gradient(to left, black calc(100% - 2.5rem), transparent); }
+  }
+}

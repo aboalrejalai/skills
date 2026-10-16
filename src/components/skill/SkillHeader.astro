@@ -6,6 +6,7 @@ import { skillStrings } from '../../i18n/strings/skill';
 import type { Lang, SkillDetail } from '../../lib/types';
 import { formatBytes, formatDate } from './format';
 import { chip } from './ui';
+import { contentLang } from '../content-lang';
 
 interface Props {
   lang: Lang;
@@ -19,13 +20,16 @@ const repoUrl = `https://github.com/${owner}/${repo}`;
 // The credit line already says "made by me", so the "made" tag would repeat it.
 const tags = skill.tags.filter((tag) => !(skill.own && tag === 'made'));
 const note = skill.note?.[lang];
+// Same hue per tag as the home cards' TagBadge (made primary, use info, recommend success, favorite warning).
+// Like TagBadge, the label stays text-foreground: 12px tinted text on a 10% tint misses WCAG AA in light mode.
 const tagTone: Record<string, string> = {
-  favorite: 'border-warning/30 bg-warning/10 text-warning',
-  made: 'border-primary/20 bg-primary/10 text-primary',
-  use: 'border-primary/20 bg-primary/10 text-primary',
-  recommend: 'border-info/30 bg-info/10 text-info',
+  favorite: 'border-warning/30 bg-warning/10 text-foreground',
+  made: 'border-primary/20 bg-primary/10 text-foreground',
+  use: 'border-info/30 bg-info/10 text-foreground',
+  recommend: 'border-success/30 bg-success/10 text-foreground',
 };
 const fact = 'inline-flex items-center gap-1.5';
+const nameLang = contentLang(skill.name);
 ---
 <header class="flex flex-col gap-5">
   <nav aria-label={t.breadcrumb}>
@@ -36,7 +40,7 @@ const fact = 'inline-flex items-center gap-1.5';
         </a>
       </li>
       <li aria-hidden="true"><ChevronRight class="size-4 rtl:rotate-180" /></li>
-      <li><span aria-current="page" dir="auto" class="font-medium text-foreground">{skill.name}</span></li>
+      <li><span aria-current="page" dir="auto" lang={nameLang} class="font-medium text-foreground">{skill.name}</span></li>
     </ol>
   </nav>
 
@@ -45,7 +49,7 @@ const fact = 'inline-flex items-center gap-1.5';
       {skill.own ? <Sparkles class="size-6" /> : <Package class="size-6" />}
     </div>
     <div class="min-w-0 flex-1">
-      <h1 class="text-2xl font-bold tracking-tight break-words md:text-3xl"><span dir="auto">{skill.name}</span></h1>
+      <h1 class="text-2xl font-bold tracking-tight break-words md:text-3xl"><span dir="auto" lang={nameLang}>{skill.name}</span></h1>
       <p class="mt-1 text-sm text-muted-foreground">
         {skill.own ? (
           <span class="font-medium text-primary">{t.madeByMe}</span>
@@ -61,7 +65,7 @@ const fact = 'inline-flex items-center gap-1.5';
     </div>
   </div>
 
-  <p dir="auto" class="max-w-3xl text-sm leading-7 text-foreground/90 md:text-base md:leading-8">{skill.description}</p>
+  <p dir="auto" lang={contentLang(skill.description)} class="max-w-3xl text-sm leading-7 text-foreground/90 md:text-base md:leading-8">{skill.description}</p>
 
   <ul class="flex flex-wrap items-center gap-2" aria-label={t.tags}>
     <li class={`${chip} border-border bg-muted/50 text-muted-foreground`}>
@@ -86,7 +90,7 @@ const fact = 'inline-flex items-center gap-1.5';
     <div class={fact}>
       <dt><FolderGit2 class="size-4" aria-hidden="true" /><span class="sr-only">{t.source}</span></dt>
       <dd>
-        <a href={repoUrl} target="_blank" rel="noopener noreferrer" dir="ltr" class="font-medium text-foreground hover:text-primary">
+        <a href={repoUrl} target="_blank" rel="noopener noreferrer" dir="ltr" class="font-medium text-foreground hover:text-primary pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:items-center">
           {owner}/{repo}<span class="sr-only"> {t.opensExternal}</span>
         </a>
       </dd>

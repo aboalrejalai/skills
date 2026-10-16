@@ -7,7 +7,7 @@ import { Marked, type Tokens } from 'marked';
 import sanitizeHtml from 'sanitize-html';
 import { createHighlighterCoreSync, type HighlighterCore } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
-import githubLight from 'shiki/themes/github-light.mjs';
+import githubLight from 'shiki/themes/github-light-high-contrast.mjs';
 import githubDark from 'shiki/themes/github-dark.mjs';
 import bash from 'shiki/langs/bash.mjs';
 import css from 'shiki/langs/css.mjs';
@@ -64,8 +64,10 @@ const LANG_ALIASES: Record<string, string> = {
 };
 
 function resolveLang(lang: string | undefined): string {
-  const name = (lang ?? '').trim().split(/\s+/)[0]?.toLowerCase() ?? '';
-  const id = LANG_ALIASES[name] ?? name;
+  const name = (typeof lang === 'string' ? lang : '').trim().split(/\s+/)[0]?.toLowerCase() ?? '';
+  // Own-property lookups only: a fence info string or file extension like "constructor" or
+  // "__proto__" must not resolve to an Object.prototype member (that crashed the build).
+  const id = Object.hasOwn(LANG_ALIASES, name) ? LANG_ALIASES[name] : name;
   return id && getHighlighter().getLoadedLanguages().includes(id) ? id : 'text';
 }
 
@@ -80,7 +82,7 @@ const EXT_LANG: Record<string, string> = {
 /** shiki language id for a file path, or 'text'. */
 export function langFromPath(path: string): string {
   const ext = path.split('/').pop()?.split('.').pop()?.toLowerCase() ?? '';
-  return EXT_LANG[ext] ?? 'text';
+  return Object.hasOwn(EXT_LANG, ext) ? EXT_LANG[ext] : 'text';
 }
 
 /**
@@ -90,7 +92,7 @@ export function langFromPath(path: string): string {
 export function highlightCode(code: string, lang?: string): string {
   return getHighlighter().codeToHtml(code.replace(/\n$/, ''), {
     lang: resolveLang(lang),
-    themes: { light: 'github-light', dark: 'github-dark' },
+    themes: { light: 'github-light-high-contrast', dark: 'github-dark' },
     defaultColor: false,
   });
 }
@@ -98,7 +100,9 @@ export function highlightCode(code: string, lang?: string): string {
 // ---------- slugs ----------
 
 /** Ids the site shell may use; a heading with this text gets a "-1" suffix instead. */
-const RESERVED_IDS = ['main', 'main-content', 'content', 'top', 'header', 'footer', 'skip'];
+const RESERVED_IDS = ['main', 'main-content', 'content', 'top', 'header', 'footer', 'skip', 'mobile-menu'];
+/** The skill page owns every "sk-" id (copy targets, tab panels, file viewers, icon sprite). */
+const RESERVED_PREFIX = 'sk-';
 
 /** GitHub-style slug that keeps Arabic and other scripts: "Mode A — New" -> "mode-a--new". */
 export function slugify(text: string): string {
@@ -112,7 +116,8 @@ export function slugify(text: string): string {
 function createSlugger() {
   const seen = new Map<string, number>(RESERVED_IDS.map((id) => [id, 0]));
   return (text: string): string => {
-    const base = slugify(text) || 'section';
+    let base = slugify(text) || 'section';
+    if (base.startsWith(RESERVED_PREFIX)) base = `section-${base}`;
     let slug = base;
     let n = seen.get(base);
     if (n !== undefined) {

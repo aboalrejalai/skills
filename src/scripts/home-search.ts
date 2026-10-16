@@ -35,6 +35,8 @@ async function copyText(text: string): Promise<boolean> {
       // Permission denied or document not focused: try the legacy path below.
     }
   }
+  // select() moves focus into the textarea; give it back afterwards so keyboard users stay on the button.
+  const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const area = document.createElement('textarea');
   area.value = text;
   area.setAttribute('readonly', '');
@@ -49,6 +51,7 @@ async function copyText(text: string): Promise<boolean> {
     ok = false;
   }
   area.remove();
+  previous?.focus({ preventScroll: true });
   return ok;
 }
 

@@ -165,3 +165,8 @@
 [dir='rtl'] .sk-tree .sk-chev { rotate: 90deg; }
 .sk-tree details[open] > summary .sk-chev { rotate: 0deg; }
 .sk-tree ul ul { border-inline-start: 1px solid var(--border); margin-inline-start: 1.125rem; padding-inline-start: 0.375rem; }
+
+/* Touch screens: 44px targets for the code-block buttons (copy, open on GitHub). */
+@media (pointer: coarse) {
+  .code-copy { block-size: 2.75rem; }
+}

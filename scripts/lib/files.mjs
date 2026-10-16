@@ -3,6 +3,17 @@ import path from 'node:path';
 import { BINARY_SNIFF_BYTES, MAX_TEXT_BYTES, SKIPPED_NAMES } from './constants.mjs';
 
 /**
+ * File names an untrusted repo may use for tricks, each skipped with a warning:
+ * backslashes (a path separator for Windows unzip tools, so a file named `..\..\x` is a zip-slip there),
+ * control characters, bidi controls that make "a\u202Etxt.sh" display as "ahs.txt" in the file tree,
+ * and "__proto__", which cannot survive as a key of SkillDetail.texts.
+ */
+const UNSAFE_NAME = /[\\\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/;
+export function isUnsafeName(name) {
+  return UNSAFE_NAME.test(name) || name === '__proto__';
+}
+
+/**
  * List every file of a skill folder, recursively.
  * Symlinks are followed when their target stays inside the folder and skipped (with a warning)
  * otherwise. Returns { files, warnings }; each file is { path, abs, size, binary, text? } where
@@ -20,6 +31,10 @@ export async function readSkillFolder(folder) {
     for (const entry of entries) {
       if (SKIPPED_NAMES.has(entry.name)) continue;
       const rel = relDir ? `${relDir}/${entry.name}` : entry.name;
+      if (isUnsafeName(entry.name)) {
+        warnings.push(`skipped ${JSON.stringify(rel)}: unsafe file name`);
+        continue;
+      }
       let abs = path.join(realDir, entry.name);
       let info = await lstat(abs);
 

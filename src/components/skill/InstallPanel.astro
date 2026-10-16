@@ -54,7 +54,7 @@ const control = 'min-h-11 w-full rounded-md border border-input bg-background px
 
   <p id="sk-install-label" class="sr-only">{t.command}</p>
   <div class="mt-4 flex items-stretch overflow-hidden rounded-md border border-border bg-muted" dir="ltr">
-    <pre class="min-w-0 flex-1 px-3 py-3 text-start text-sm leading-6 whitespace-pre-wrap [overflow-wrap:anywhere]" aria-labelledby="sk-install-label"><code id="sk-install-cmd" data-install-output>{skill.install}</code></pre>
+    <pre class="min-w-0 flex-1 px-3 py-3 text-start text-sm leading-6 whitespace-pre-wrap [overflow-wrap:anywhere]" aria-live="polite"><code id="sk-install-cmd" data-install-output>{skill.install}</code></pre>
     <button
       type="button"
       class={`${iconBtn} self-start me-0.5 mt-0.5`}
@@ -78,7 +78,7 @@ const control = 'min-h-11 w-full rounded-md border border-input bg-background px
     <a href={skill.zipUrl} download={`${skill.name}.zip`} class={`${btnPrimary} w-full`}>
       <Download class="size-4" aria-hidden="true" />
       <span>{t.downloadZip}</span>
-      <span class="text-xs font-normal opacity-80" dir="auto">({zipSize})</span>
+      <span class="text-xs font-normal" dir="auto">({zipSize})</span>
     </a>
     <a href={skill.githubUrl} target="_blank" rel="noopener noreferrer" class={`${btnOutline} w-full`}>
       <FolderGit2 class="size-4" aria-hidden="true" />{t.viewGithub}<span class="sr-only"> {t.opensExternal}</span>

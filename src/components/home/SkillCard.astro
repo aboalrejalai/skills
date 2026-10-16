@@ -8,6 +8,7 @@ import type { Lang, SkillEntry } from '../../lib/types';
 import { CATEGORY_ICONS, TAG_ORDER } from './catalog-view';
 import CopyButton from './CopyButton.astro';
 import TagBadge from './TagBadge.astro';
+import { contentLang } from '../content-lang';
 
 interface Props {
   skill: SkillEntry;
@@ -30,7 +31,7 @@ const repo = `${skill.source.owner}/${skill.source.repo}`;
   data-search={search}
   class="h-full"
 >
-  <article class="relative flex h-full flex-col gap-3 rounded-xl border border-border bg-card p-5 transition-colors focus-within:border-primary/40 hover:border-primary/40 hover:bg-primary/5">
+  <article class="relative flex h-full flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-e1 transition focus-within:border-primary/40 hover:border-primary/40 hover:bg-primary/5 hover:shadow-e3">
     <div class="flex items-start gap-3">
       <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
         <Icon class="size-5" />
@@ -40,6 +41,7 @@ const repo = `${skill.source.owner}/${skill.source.repo}`;
           <a
             href={localePath(lang, `/skills/${skill.id}/`)}
             dir="auto"
+            lang={contentLang(skill.name)}
             class="break-words rounded-sm after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-ring"
           >{skill.name}</a>
         </h3>
@@ -47,7 +49,7 @@ const repo = `${skill.source.owner}/${skill.source.repo}`;
       </div>
     </div>
 
-    <p dir="auto" class="line-clamp-2 text-sm text-muted-foreground">{skill.description}</p>
+    <p dir="auto" lang={contentLang(skill.description)} class="line-clamp-2 text-sm text-muted-foreground">{skill.description}</p>
 
     {tags.length > 0 && (
       <ul class="flex flex-wrap gap-1.5" aria-label={t.tagsLabel}>

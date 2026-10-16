@@ -13,6 +13,7 @@ import SkillHeader from './SkillHeader.astro';
 import TableOfContents from './TableOfContents.astro';
 import { buildFileTree, planFileViews, stringifyValue } from './format';
 import { card } from './ui';
+import { contentLang } from '../content-lang';
 import './skill-prose.css';
 
 interface Props {
@@ -51,18 +52,22 @@ const panelHeading = 'mb-4 flex items-center gap-2 text-base font-semibold group
 ---
 <BaseLayout lang={lang} title={`${skill.name} — ${t.titleSuffix}`} description={skill.description} path={path} type="article" jsonLd={jsonLd}>
   <article class="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-10">
-    <SkillHeader lang={lang} skill={skill} />
+    <!-- The header shares the main column so the install panel starts at the top on desktop
+         (above the fold) instead of below a full-width header. DOM order = mobile order. -->
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div class="min-w-0 lg:col-start-1 lg:row-start-1">
+        <SkillHeader lang={lang} skill={skill} />
+      </div>
 
-    <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-8">
       <aside
         aria-label={t.actions}
-        class="flex min-w-0 flex-col gap-6 lg:sticky lg:top-[calc(var(--topbar-height)+1rem)] lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100dvh-var(--topbar-height)-2rem)] lg:self-start lg:overflow-y-auto lg:p-0.5 lg:[scrollbar-width:thin]"
+        class="flex min-w-0 flex-col gap-6 lg:sticky lg:top-[calc(var(--topbar-height)+1rem)] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-var(--topbar-height)-2rem)] lg:self-start lg:overflow-y-auto lg:p-0.5 lg:[scrollbar-color:var(--border)_transparent] lg:[scrollbar-width:thin]"
       >
         <InstallPanel lang={lang} skill={skill} />
         <TableOfContents lang={lang} headings={headings} variant="side" class="hidden lg:block" />
       </aside>
 
-      <section class="group/tabs min-w-0 lg:col-start-1 lg:row-start-1" aria-label={t.content} data-tabs>
+      <section class="group/tabs min-w-0 lg:col-start-1 lg:row-start-2" aria-label={t.content} data-tabs>
         <div role="tablist" aria-label={t.content} class="mb-5 flex gap-1 overflow-x-auto overflow-y-hidden shadow-[inset_0_-1px_0_var(--border)] [scrollbar-width:none]" data-tablist hidden>
           {tabs.map((tab, i) => (
             <button
@@ -75,7 +80,7 @@ const panelHeading = 'mb-4 flex items-center gap-2 text-base font-semibold group
               class="inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 border-transparent px-3 text-sm sm:px-4 font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground aria-selected:border-primary aria-selected:text-primary"
               data-tab={tab.key}
             >
-              <tab.icon class="size-4" aria-hidden="true" />{tab.label}
+              <tab.icon class="size-4 max-sm:hidden" aria-hidden="true" />{tab.label}
             </button>
           ))}
         </div>
@@ -86,7 +91,7 @@ const panelHeading = 'mb-4 flex items-center gap-2 text-base font-semibold group
             <TableOfContents lang={lang} headings={headings} variant="inline" class="mb-5 lg:hidden" />
             <div class={`${card} px-4 py-5 sm:px-6 sm:py-6`}>
               {html.trim() ? (
-                <div class="sk-prose" dir="auto" set:html={html} />
+                <div class="sk-prose" dir="auto" lang={contentLang(skill.body)} set:html={html} />
               ) : (
                 <p class="text-sm text-muted-foreground">{t.emptyBody}</p>
               )}
@@ -119,7 +124,7 @@ const panelHeading = 'mb-4 flex items-center gap-2 text-base font-semibold group
                           {typeof value === 'object' && value !== null ? (
                             <pre class="font-mono text-xs leading-5 whitespace-pre-wrap break-words text-start" dir="ltr">{stringifyValue(value)}</pre>
                           ) : (
-                            <p dir="auto" class="leading-6 break-words">{stringifyValue(value)}</p>
+                            <p dir="auto" lang={contentLang(stringifyValue(value))} class="leading-6 break-words">{stringifyValue(value)}</p>
                           )}
                         </td>
                       </tr>

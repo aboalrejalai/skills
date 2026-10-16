@@ -28,6 +28,9 @@ const STORED_EXT = new Set([
 // Fixed DOS timestamp (local time, as the zip format stores it) for reproducible output.
 const MTIME = new Date(1980, 0, 1, 0, 0, 0);
 const SAFE_SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+// Entry names an unzip tool could misread: a backslash is a separator on Windows (`..\..\x` escapes
+// the target folder there), ":" can name a drive or an NTFS stream, and control/bidi characters spoof names.
+const UNSAFE_ENTRY = /[\\:\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/;
 
 const { values: args } = parseArgs({
   options: {
@@ -66,6 +69,10 @@ function collectFiles(skillDir, warn) {
       if (SKIP_NAMES.has(entry.name)) continue;
       const abs = path.join(dir, entry.name);
       const rel = relDir ? `${relDir}/${entry.name}` : entry.name;
+      if (UNSAFE_ENTRY.test(entry.name) || entry.name === '.' || entry.name === '..') {
+        warn(`unsafe file name skipped: ${JSON.stringify(rel)}`);
+        continue;
+      }
       let real = abs;
       if (entry.isSymbolicLink()) {
         try {

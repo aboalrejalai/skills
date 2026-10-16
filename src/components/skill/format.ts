@@ -86,7 +86,7 @@ export function planFileViews(
   const views = new Map<string, FileView>();
   let inlined = 0;
   let highlighted = 0;
-  const candidates = files.filter((f) => !f.binary && texts[f.path] !== undefined).sort((a, b) => a.size - b.size);
+  const candidates = files.filter((f) => !f.binary && Object.hasOwn(texts, f.path)).sort((a, b) => a.size - b.size);
   for (const f of candidates) {
     const size = texts[f.path].length;
     if (inlined + size > inlineBudget) {

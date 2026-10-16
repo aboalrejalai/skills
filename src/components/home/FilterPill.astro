@@ -16,8 +16,8 @@ const { group, value, label, count, active = false } = Astro.props;
   data-filter={group}
   data-value={value}
   aria-pressed={active ? 'true' : 'false'}
-  class="inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-card px-3.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary-hover pointer-coarse:h-11"
+  class="group inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-card px-3.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary-hover pointer-coarse:h-11"
 >
-  {label}
-  {count !== undefined && <span class="text-xs tabular-nums opacity-75">{count.toLocaleString('en-US')}</span>}
+  {label}{' '}
+  {count !== undefined && <span class="text-xs tabular-nums opacity-75 group-aria-pressed:opacity-100">{count.toLocaleString('en-US')}</span>}
 </button>

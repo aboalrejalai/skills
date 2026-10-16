@@ -24,7 +24,7 @@ const otherLang: Lang = lang === 'ar' ? 'en' : 'ar';
           <SearchX size={24} aria-hidden="true" />
         </div>
         <div class="min-w-0">
-          <p class="text-sm font-medium text-muted-foreground" dir="ltr">404</p>
+          <p class="text-sm font-medium text-muted-foreground">404</p>
           <h1 class="text-2xl font-bold tracking-tight md:text-3xl">{t.heading}</h1>
           <p class="mt-1 text-sm text-muted-foreground md:text-base">{t.body}</p>
         </div>
@@ -33,7 +33,7 @@ const otherLang: Lang = lang === 'ar' ? 'en' : 'ar';
     <div class="flex flex-wrap items-center gap-2 ps-15">
       <a
         href={home}
-        class="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        class="inline-flex h-10 items-center pointer-coarse:h-11 gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <House size={16} aria-hidden="true" />
         {t.home}
@@ -42,7 +42,7 @@ const otherLang: Lang = lang === 'ar' ? 'en' : 'ar';
         href={otherHome}
         hreflang={otherLang}
         lang={otherLang}
-        class="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        class="inline-flex h-10 items-center pointer-coarse:h-11 gap-2 rounded-md border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <Languages size={16} aria-hidden="true" />
         {t.otherLang}

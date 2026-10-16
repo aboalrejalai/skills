@@ -15,6 +15,8 @@ async function copyText(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
+    // select() moves focus into the textarea; give it back afterwards so keyboard users stay on the button.
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const area = document.createElement('textarea');
     area.value = text;
     area.setAttribute('readonly', '');
@@ -29,6 +31,7 @@ async function copyText(text: string): Promise<boolean> {
       ok = false;
     }
     area.remove();
+    previous?.focus({ preventScroll: true });
     return ok;
   }
 }
@@ -76,7 +79,13 @@ function textFor(button: HTMLElement): string | undefined {
 }
 
 function initCopy() {
-  document.querySelectorAll<HTMLElement>('[data-copy], [data-copy-code]').forEach((b) => b.removeAttribute('hidden'));
+  const pageLang = document.documentElement.lang;
+  document.querySelectorAll<HTMLElement>('[data-copy], [data-copy-code]').forEach((b) => {
+    b.removeAttribute('hidden');
+    // Code-block buttons sit inside the SKILL.md body, which carries the upstream text's lang;
+    // their label is a UI string in the page language.
+    if (b.closest('[lang]') !== document.documentElement) b.lang = pageLang;
+  });
   document.addEventListener('click', async (event) => {
     const button = (event.target as Element | null)?.closest<HTMLElement>('[data-copy], [data-copy-code]');
     if (!button) return;
@@ -99,7 +108,9 @@ function initInstall() {
     const parts = [base];
     if (agent?.value) parts.push('-a', agent.value);
     if (global?.checked) parts.push('-g');
-    output.textContent = parts.join(' ');
+    // The output is a polite live region: only touch it on a real change, so page load stays silent.
+    const next = parts.join(' ');
+    if (output.textContent !== next) output.textContent = next;
   };
   agent?.addEventListener('change', update);
   global?.addEventListener('change', update);
